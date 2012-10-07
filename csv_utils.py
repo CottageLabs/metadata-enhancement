@@ -74,7 +74,7 @@ class CSVUtils(object):
             row_count += 1
         
         del self.columns[merge_this]
-                
+        
     def debug(self):
         print '##### Columns #####'
         print self.columns
