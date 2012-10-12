@@ -15,7 +15,7 @@ class CSVWrapper(object):
     # initialisation functions
     ##########################################################
     
-    def popualte_csv_dict(self):
+    def populate_csv_dict(self):
         """
         from self.source_csv_path, load csv and populate the
         csv_dict, of the form:
@@ -36,10 +36,11 @@ class CSVWrapper(object):
         for convenience in member functions
         """
         # grab any old column, they all have all item ids in them
-        column = self.csv_dict.keys()[0]
+        # column = self.csv_dict.keys()[0]
         
         # store the list of keys
-        self.ids = column.keys()
+        # self.ids = column.keys()
+        pass
 
     def save(self, path):
         """
@@ -51,8 +52,49 @@ class CSVWrapper(object):
     # csv manipulation functions
     ##########################################################
     
-    def apply_value_function(column, fn):
+    def apply_value_function(self, column, fn):
         """
         Apply the supplied value to every value in the supplied column
         """
         pass
+        
+        
+    def delete_column(self, column):
+        """
+        Delete a column from the dataset with all its data.
+        """
+        pass
+        
+    def delete_record(self, item_id):
+        """
+        Delete a record (row) given the item_id of the item that's stored in the record.
+        """
+        pass
+        
+    def find_in_column(self, column, search_for):
+        """
+        Find all records which contain the specified value in the specified column and return a list of the matching Jorum item ID-s.
+        """
+        return []
+        
+    def merge_columns(self, src, dst):
+        """
+        Merges two CSV columns. If there are overlapping values, the fields are concatenated (i.e. non-destructive merging - no data is overwritten).
+        
+        Takes two column names as its two parameters.
+            The first column is the one that you want to try to merge with the second one. The first column will be deleted after a successful merge.
+            The second column is the one that will end up with all the data - the one you are merging *into*. After a successful merge, it will have the data from both columns.
+        """
+        pass
+        
+    def set_value(self, column, item_id, *values):
+        """
+        Set the value of a cell to the specified value(s). The cell to be modified is specified by the column and Jorum item ID. Multiple values are allowed in the form of *args.
+        """
+        pass
+        
+    def delete_value(self, column, item_id):
+        """
+        Deletes the contents of a cell specified by the column and Jorum item ID.
+        """
+        self.set_value(column, item_id, '')
