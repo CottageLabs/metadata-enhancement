@@ -22,25 +22,25 @@ def rule1b_advisor(csv_wrapper):
     item_ids = csv_wrapper.find_in_column(working_on, 'DiPEX')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.publisher', item_id, 'DIPEx')
-        csv_wrapper.delete_value(working_on, item_id)
+        csv_wrapper.delete_contents(working_on, item_id)
     
     # 1.b.iii. iCase bioukoer (x3) -> dc.subject, split by whitespace, add ukoer to subject also
     item_ids = csv_wrapper.find_in_column(working_on, 'iCase bioukoer')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.subject[en]', item_id, ['iCase', 'bioukoer', 'ukoer'])
-        csv_wrapper.delete_value(working_on, item_id)
+        csv_wrapper.delete_contents(working_on, item_id)
     
     # 1.b.iv. Rong Yang (x1) -> move to dc.contributor.author[en]
     item_ids = csv_wrapper.find_in_column(working_on, 'Rong Yang')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.contributor.author[en]', item_id, 'Rong Yang')
-        csv_wrapper.delete_value(working_on, item_id)
+        csv_wrapper.delete_contents(working_on, item_id)
         
     # 1.b.v. UCLAN (x1) -> delete value, add uclanoer to dc.subject
     item_ids = csv_wrapper.find_in_column(working_on, 'UCLAN')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.subject[en]', item_id, 'uclanoer')
-        csv_wrapper.delete_value(working_on, item_id)
+        csv_wrapper.delete_contents(working_on, item_id)
     
 # 1.c. delete Advisor column group
 # dc.contributor.advisor[en] should be the only column left from the Advisor group by now
@@ -76,14 +76,27 @@ def rule2e_author(csv_wrapper):
 def rule2f_author(csv_wrapper):
     item_ids = csv_wrapper.find_in_column('dc.contributor.author[en]', 'contributor')
     for item_id in item_ids:
-        csv_wrapper.delete_value('dc.contributor.author[en]', item_id)
+        csv_wrapper.delete_contents('dc.contributor.author[en]', item_id)
 
 # 2.g. if value is a VCARD, get the name and leave only the name
 def rule2g_author(csv_wrapper):
-    item_ids = csv_wrapper.find_partial_in_column('dc.contributor.author[en]', 'vcard')
+    item_ids = csv_wrapper.find_in_column('dc.contributor.author[en]', 'vcard', partial = True)
     for item_id in item_ids:
-        csv_wrapper.delete_value('dc.contributor.author[en]', item_id)
-        
+        contents = csv_wrapper.get_contents('dc.contributor.author[en]', item_id)
+        new_contents = []
+        for value in contents:
+            if 'vcard' in value:
+                # The example of a VCARD that we have starts with the name
+                # and continues with the ORG (ORGanisation) field. So finding 
+                # where the ORG field starts gives us the end of the name 
+                # (after we subtract 1 from it).
+                end_of_name = value.find('ORG') - 1
+                # Get only the name (ignoring the space character after it 
+                # and then the rest of the VCARD info).
+                new_contents.append(value[:end_of_name])
+            else:
+                new_contents.append(value)
+        csv_wrapper.set_contents('dc.contributor.author[en]', item_id, new_contents)
 # Date columns
 ###########################################################
 
