@@ -122,6 +122,12 @@ class CSVWrapper(object):
         """
         pass
         
+    def add_value(self, column, item_id, *values):
+        """
+        Add the specified value(s) to the existing contents of the cell. The cell to be modified is specified by the column and Jorum item ID. Multiple values are allowed in the form of *args.
+        """
+        pass
+        
     def delete_value(self, column, item_id):
         """
         Deletes the contents of a cell specified by the column and Jorum item ID.
