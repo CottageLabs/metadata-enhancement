@@ -8,8 +8,8 @@ class CSVWrapper(object):
 
     def __init__(self, csv_file_path):
         self.source_csv_path = csv_file_path
-        self.csv_dict = self.populate_csv_dict()
-        self.ids = self.populate_ids()
+        self.populate_csv_dict()
+        self.populate_ids()
     
     ##########################################################
     # initialisation functions
@@ -28,7 +28,20 @@ class CSVWrapper(object):
           ...
         }
         """
-        pass
+        reader = csv.reader(open(self.source_csv_path))
+        first = True
+        self.csv_dict = {}
+        header_index_map = {}
+        for row in reader:
+            for i in range(len(row)): # be explicit about reading the indices of the row
+                if first:
+                    self.csv_dict[row[i]] = {}
+                    header_index_map[i] = row[i]
+                else:
+                    key = header_index_map[i]
+                    self.csv_dict[key][int(row[0])] = self._tokenise(row[i])
+            if first: 
+                first = False
         
     def populate_ids(self):
         """
@@ -36,17 +49,33 @@ class CSVWrapper(object):
         for convenience in member functions
         """
         # grab any old column, they all have all item ids in them
-        # column = self.csv_dict.keys()[0]
+        column = self.csv_dict.keys()[0]
         
         # store the list of keys
-        # self.ids = column.keys()
-        pass
+        self.ids = self.csv_dict[column].keys()
 
     def save(self, path):
         """
         Save the self.csv_dict as a csv file to the supplied file path
         """
-        pass
+        writer = csv.writer(open(path, "w"))
+        
+        # first, the headers
+        header_index_map = {}
+        header_row = []
+        i = 0
+        for header in self.csv_dict.keys():
+            header_row[i] = header
+            header_index_map[header] = i
+            i += 1
+        writer.writerow(header_row)
+        
+        # now, each item id
+        # TODO - got to go
+    
+    def _tokenise(self, cell_value):
+        return [v.strip() for v in cell_value.split("||")]
+        
 
     ##########################################################
     # csv manipulation functions
@@ -54,7 +83,7 @@ class CSVWrapper(object):
     
     def apply_value_function(self, column, fn):
         """
-        Apply the supplied value to every value in the supplied column
+        Apply the supplied function to every value in the supplied column
         """
         pass
         
