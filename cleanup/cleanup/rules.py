@@ -4,46 +4,45 @@ metadata cleanup tasks
 """
 # 1. Advisor columns
 ###########################################################
+
+# 1.a. merge dc.contributor.advisor[] into dc.contributor.advisor[en]
 def rule1a_advisor(csv_wrapper):
     csv_wrapper.merge_columns('dc.contributor.advisor[]', 'dc.contributor.advisor[en]')
 
+# 1.b. Move the following values to the following locations:
 def rule1b_advisor(csv_wrapper):
     working_on = 'dc.contributor.advisor[en]' # column we're working on
     
-    # i
+    # 1.b.i. conadv (x1) -> delete record
     item_ids = csv_wrapper.find_in_column(working_on, 'conadv')
     for item_id in item_ids:
         csv_wrapper.delete_record(item_id)
     
-    # ii
+    # 1.b.ii. DiPEX (x1) -> dc.publisher (as DIPEx)
     item_ids = csv_wrapper.find_in_column(working_on, 'DiPEX')
     for item_id in item_ids:
         csv_wrapper.set_value('dc.publisher', item_id, 'DIPEx')
         csv_wrapper.delete_value(working_on, item_id)
     
-    # iii
+    # 1.b.iii. iCase bioukoer (x3) -> dc.subject, split by whitespace, add ukoer to subject also
     item_ids = csv_wrapper.find_in_column(working_on, 'iCase bioukoer')
     for item_id in item_ids:
         csv_wrapper.set_value('dc.subject[en]', item_id, ['iCase', 'bioukoer', 'ukoer'])
         csv_wrapper.delete_value(working_on, item_id)
     
-    # iv
+    # 1.b.iv. Rong Yang (x1) -> move to dc.contributor.author[en]
     item_ids = csv_wrapper.find_in_column(working_on, 'Rong Yang')
     for item_id in item_ids:
         csv_wrapper.set_value('dc.contributor.author[en]', item_id, 'Rong Yang')
         csv_wrapper.delete_value(working_on, item_id)
         
-    # v
+    # 1.b.v. UCLAN (x1) -> delete value, add uclanoer to dc.subject
     item_ids = csv_wrapper.find_in_column(working_on, 'UCLAN')
     for item_id in item_ids:
         csv_wrapper.set_value('dc.subject[en]', item_id, 'uclanoer')
         csv_wrapper.delete_value(working_on, item_id)
-        
-    # vi
-    item_ids = csv_wrapper.find_in_column(working_on, '||')
-    for item_id in item_ids:
-        csv_wrapper.delete_record(item_id)
     
+# 1.c. delete Advisor column group    
 def rule1c_advisor(csv_wrapper):
     csv_wrapper.delete_column('dc.contributor.advisor[en]')
     
