@@ -89,16 +89,23 @@ def rule2g_author(csv_wrapper):
                 # The example of a VCARD that we have starts with the name
                 # and continues with the ORG (ORGanisation) field. So finding 
                 # where the ORG field starts gives us the end of the name 
-                # (after we subtract 1 from it).
+                # (we have to get the character *before* the ORG field, so -1).
                 end_of_name = value.find('ORG') - 1
                 # Get only the name (ignoring the space character after it 
-                # and then the rest of the VCARD info).
+                # and the rest of the VCARD info).
                 new_contents.append(value[:end_of_name])
             else:
                 new_contents.append(value)
         csv_wrapper.set_contents('dc.contributor.author[en]', item_id, new_contents)
 
-# Date columns
+# 3. Creator column group
+###########################################################
+
+# 3.a. merge dc.creator[] into dc.creator
+def rule3a_creator(csv_wrapper):
+    csv_wrapper.merge_columns('dc.creator[]', 'dc.creator')
+        
+# 7. Date columns
 ###########################################################
 
 # 7.a. reformat the content of dc.date[] into a timestamp
