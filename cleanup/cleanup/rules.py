@@ -21,31 +21,69 @@ def rule1b_advisor(csv_wrapper):
     # 1.b.ii. DiPEX (x1) -> dc.publisher (as DIPEx)
     item_ids = csv_wrapper.find_in_column(working_on, 'DiPEX')
     for item_id in item_ids:
-        csv_wrapper.set_value('dc.publisher', item_id, 'DIPEx')
+        csv_wrapper.add_value('dc.publisher', item_id, 'DIPEx')
         csv_wrapper.delete_value(working_on, item_id)
     
     # 1.b.iii. iCase bioukoer (x3) -> dc.subject, split by whitespace, add ukoer to subject also
     item_ids = csv_wrapper.find_in_column(working_on, 'iCase bioukoer')
     for item_id in item_ids:
-        csv_wrapper.set_value('dc.subject[en]', item_id, ['iCase', 'bioukoer', 'ukoer'])
+        csv_wrapper.add_value('dc.subject[en]', item_id, ['iCase', 'bioukoer', 'ukoer'])
         csv_wrapper.delete_value(working_on, item_id)
     
     # 1.b.iv. Rong Yang (x1) -> move to dc.contributor.author[en]
     item_ids = csv_wrapper.find_in_column(working_on, 'Rong Yang')
     for item_id in item_ids:
-        csv_wrapper.set_value('dc.contributor.author[en]', item_id, 'Rong Yang')
+        csv_wrapper.add_value('dc.contributor.author[en]', item_id, 'Rong Yang')
         csv_wrapper.delete_value(working_on, item_id)
         
     # 1.b.v. UCLAN (x1) -> delete value, add uclanoer to dc.subject
     item_ids = csv_wrapper.find_in_column(working_on, 'UCLAN')
     for item_id in item_ids:
-        csv_wrapper.set_value('dc.subject[en]', item_id, 'uclanoer')
+        csv_wrapper.add_value('dc.subject[en]', item_id, 'uclanoer')
         csv_wrapper.delete_value(working_on, item_id)
     
-# 1.c. delete Advisor column group    
+# 1.c. delete Advisor column group
+# dc.contributor.advisor[en] should be the only column left from the Advisor group by now
 def rule1c_advisor(csv_wrapper):
     csv_wrapper.delete_column('dc.contributor.advisor[en]')
     
+    
+# 2. Author column group
+###########################################################
+
+# 2.a. merge dc.contributor.author[] into dc.contributor.author
+def rule2a_author(csv_wrapper):
+    csv_wrapper.merge_columns('dc.contributor.author[]', 'dc.contributor.author')
+
+# 2.b. merge dc.contributor.author[x-none] into dc.contributor.author
+def rule2b_author(csv_wrapper):
+    csv_wrapper.merge_columns('dc.contributor.author[x-none]', 'dc.contributor.author')
+
+# 2.c. merge dc.contributor.author into dc.contributor.author[en]
+def rule2c_author(csv_wrapper):
+    csv_wrapper.merge_columns('dc.contributor.author', 'dc.contributor.author[en]')
+    
+# 2.d. delete dc.contributor.author[English]
+def rule2d_author(csv_wrapper):
+    csv_wrapper.delete_column('dc.contributor.author[English]')
+    
+# 2.e. merge dc.contributor.author[en-gb] into dc.publisher[en]
+def rule2e_author(csv_wrapper):
+    csv_wrapper.merge_columns('dc.contributor.author[en-gb]', 'dc.publisher[en]')
+
+# 2.f. if value == 'contributor', delete it (only Author columns)
+# dc.contributor.author[en] should be the only Author column left at this point
+def rule2f_author(csv_wrapper):
+    item_ids = csv_wrapper.find_in_column('dc.contributor.author[en]', 'contributor')
+    for item_id in item_ids:
+        csv_wrapper.delete_value('dc.contributor.author[en]', item_id)
+
+# 2.g. if value is a VCARD, get the name and leave only the name
+def rule2g_author(csv_wrapper):
+    item_ids = csv_wrapper.find_partial_in_column('dc.contributor.author[en]', 'vcard')
+    for item_id in item_ids:
+        csv_wrapper.delete_value('dc.contributor.author[en]', item_id)
+        
 # Date columns
 ###########################################################
 
