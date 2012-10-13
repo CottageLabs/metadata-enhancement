@@ -138,4 +138,5 @@ class CSVWrapper(object):
         """
         Deletes the contents of a cell specified by the column and Jorum item ID.
         """
-        self.set_value(column, item_id, '')
+        # Maybe do sth. like self.set_contents(column, item_id, '')
+        pass

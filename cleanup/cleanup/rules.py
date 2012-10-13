@@ -97,6 +97,7 @@ def rule2g_author(csv_wrapper):
             else:
                 new_contents.append(value)
         csv_wrapper.set_contents('dc.contributor.author[en]', item_id, new_contents)
+
 # Date columns
 ###########################################################
 
