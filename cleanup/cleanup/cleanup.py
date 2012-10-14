@@ -38,6 +38,7 @@ print "CONFIG: Modifying metadata in " + CSV
 print "CONFIG: Writing changes to " + OUT
 if RULE is not None:
     print "CONFIG: Running rule " + RULE
+print
 
 # define the order of the rules to be run
 runrules = []
@@ -58,13 +59,16 @@ else: # run all of the rules
 print "Loading csv from " + CSV + " ..."
 csv_wrapper = CSVWrapper(CSV)
 print "done"
+print
 
 # run through all the rules, passing in the wrapper each time
 for rule in runrules:
     print "Executing rule " + rule.__name__ + " ..."
     rule(csv_wrapper)
     print "complete"
+print
 
 # once we're finished, write out the results
-print "Saving ..."
+print "Saving to " + OUT + " ..."
 csv_wrapper.save(OUT)
+print "done"
