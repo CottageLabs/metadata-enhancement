@@ -80,24 +80,21 @@ def rule2f_author(csv_wrapper):
 
 # 2.g. if value is a VCARD, get the name and leave only the name
 def rule2g_author(csv_wrapper):
-    item_ids = csv_wrapper.find_in_column('dc.contributor.author[en]', 'vcard', partial = True)
-    for item_id in item_ids:
-        contents = csv_wrapper.get_contents('dc.contributor.author[en]', item_id)
-        new_contents = []
-        for value in contents:
-            if 'vcard' in value:
-                # The example of a VCARD that we have starts with the name
-                # and continues with the ORG (ORGanisation) field. So finding 
-                # where the ORG field starts gives us the end of the name 
-                # (we have to get the character *before* the ORG field, so -1).
-                end_of_name = value.find('ORG') - 1
-                # Get only the name (ignoring the space character after it 
-                # and the rest of the VCARD info).
-                new_contents.append(value[:end_of_name])
-            else:
-                new_contents.append(value)
-        csv_wrapper.set_contents('dc.contributor.author[en]', item_id, new_contents)
-
+    def replace_vcard(data):
+        if 'vcard' in data:
+            # The example of a VCARD that we have starts with the name
+            # and continues with the ORG (ORGanisation) field. So finding 
+            # where the ORG field starts gives us the end of the name 
+            # (we have to get the character *before* the ORG field, so -1).
+            end_of_name = data.find('ORG') - 1
+            # Get only the name (ignoring the space character after it 
+            # and the rest of the VCARD info).
+            return data[:end_of_name]
+        else:
+            return data
+        
+    csv_wrapper.apply_value_function('dc.contributor.author[x-none]', replace_vcard)
+    
 # 3. Creator column group
 ###########################################################
 

@@ -138,18 +138,6 @@ class CSVWrapper(object):
             The second column is the one that will end up with all the data - the one you are merging *into*. After a successful merge, it will have the data from both columns.
         """
         pass
-    
-    def get_contents(self, column, item_id):
-        """
-        Get the contents of a cell identified by the column and Jorum item ID.
-        """
-        pass
-    
-    def set_contents(self, column, item_id, *values):
-        """
-        Set the value of a cell to the specified value(s). The cell to be modified is specified by the column and Jorum item ID. Multiple values are allowed in the form of *args.
-        """
-        pass
         
     def add_value(self, column, item_id, *values):
         """
@@ -163,3 +151,17 @@ class CSVWrapper(object):
         """
         # Maybe do sth. like self.set_contents(column, item_id, '')
         pass
+
+    # Deprecated method templates below - if found to be required, move above 
+    # this line and uncomment.
+    # def get_contents(self, column, item_id):
+        # """
+        # Get the contents of a cell identified by the column and Jorum item ID.
+        # """
+        # pass
+    
+    # def set_contents(self, column, item_id, *values):
+        # """
+        # Set the value of a cell to the specified value(s). The cell to be modified is specified by the column and Jorum item ID. Multiple values are allowed in the form of *args.
+        # """
+        # pass
