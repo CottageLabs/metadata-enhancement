@@ -113,6 +113,39 @@ def rule3b_creator(csv_wrapper):
         
     csv_wrapper.apply_value_function('dc.creator', split_by_semicolon)
     
+# 4. Contributor column group
+###########################################################
+
+# 4.a. Detect all email addresses in dc.contributor and remove
+def rule4a_contributor(csv_wrapper):
+    def is_email_address(str):
+    r = re.compile('[^@]+@[^@]+\.[^@]+')
+    if r.match(str):
+        return True
+    else:
+        return False
+        
+    def delete_emails(data):
+        if is_email_address(data):
+            return None
+        else:
+            return data
+    
+    csv_wrapper.apply_value_function('dc.contributor', delete_emails)
+    
+# 4.b. Move all non-email addresses from dc.contributor to dc.publisher[en]
+# Previous rule 4.a. should have removed all e-mail addresses, so we basically
+# need to move all the strings remaining in dc.contributor to dc.publisher[en].
+# This would result in a completely empty dc.contributor, so actually what we 
+# want to do is merge dc.contributor INTO dc.publisher[en].
+def rule4b_contributor(csv_wrapper):
+    csv_wrapper.merge_columns('dc.contributor', 'dc.publisher[en]')
+    
+# 4.c. Move all from dc.contributor[x-none] to dc.publisher[en]
+# In other words, merge dc.contributor[x-none] INTO dc.publisher[en]
+def rule4c_contributor(csv_wrapper):
+    csv_wrapper.merge_columns('dc.contributor[x-none]', 'dc.publisher[en]')
+    
 # 7. Date columns
 ###########################################################
 

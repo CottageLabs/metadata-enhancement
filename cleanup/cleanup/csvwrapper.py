@@ -107,7 +107,8 @@ class CSVWrapper(object):
             for original_value in original_values:
                 #try:
                 new_value = fn(original_value)
-                new_values.append(new_value)
+                if new_value: # leave out '', None and so on - a nice way to delete values
+                    new_values.append(new_value)
                 #except:
                     # leave the value as is
                     # new_values.append(original_value)
