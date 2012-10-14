@@ -65,8 +65,14 @@ class CSVWrapper(object):
             # first, the headers
             header_index_map = {}
             header_row = []
+            # lets have all the keys in alphabetical order, bringing "id" and "collection"
+            # to the front
+            keys = self.csv_dict.keys()
+            keys.sort() 
+            keys = ['id', 'collection'] + [k for k in keys if k != 'id' and k != 'collection']
+            
             i = 0
-            for header in self.csv_dict.keys():
+            for header in keys:
                 header_row.append(header)
                 header_index_map[header] = i
                 i += 1
