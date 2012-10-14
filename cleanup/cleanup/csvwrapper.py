@@ -28,20 +28,21 @@ class CSVWrapper(object):
           ...
         }
         """
-        reader = csv.reader(open(self.source_csv_path))
-        first = True
-        self.csv_dict = {}
-        header_index_map = {}
-        for row in reader:
-            for i in range(len(row)): # be explicit about reading the indices of the row
-                if first:
-                    self.csv_dict[row[i]] = {}
-                    header_index_map[i] = row[i]
-                else:
-                    key = header_index_map[i]
-                    self.csv_dict[key][int(row[0])] = self._tokenise(row[i])
-            if first: 
-                first = False
+        with open(self.source_csv_path) as f:
+            reader = csv.reader(f)
+            first = True
+            self.csv_dict = {}
+            header_index_map = {}
+            for row in reader:
+                for i in range(len(row)): # be explicit about reading the indices of the row
+                    if first:
+                        self.csv_dict[row[i]] = {}
+                        header_index_map[i] = row[i]
+                    else:
+                        key = header_index_map[i]
+                        self.csv_dict[key][int(row[0])] = self._tokenise(row[i])
+                if first: 
+                    first = False
         
     def populate_ids(self):
         """
@@ -58,24 +59,31 @@ class CSVWrapper(object):
         """
         Save the self.csv_dict as a csv file to the supplied file path
         """
-        writer = csv.writer(open(path, "w"))
-        
-        # first, the headers
-        header_index_map = {}
-        header_row = []
-        i = 0
-        for header in self.csv_dict.keys():
-            header_row[i] = header
-            header_index_map[header] = i
-            i += 1
-        writer.writerow(header_row)
-        
-        # now, each item id
-        # TODO - got to go
+        with open(path, "w") as f:
+            writer = csv.writer(f)
+            
+            # first, the headers
+            header_index_map = {}
+            header_row = []
+            i = 0
+            for header in self.csv_dict.keys():
+                header_row.append(header)
+                header_index_map[header] = i
+                i += 1
+            writer.writerow(header_row)
+            
+            # now, each item id
+            for id in self.ids:
+                item_row = [None] * len(self.csv_dict.keys())
+                for header, i in header_index_map.iteritems():
+                    item_row[i] = self._serialise(self.csv_dict[header][id])
+                writer.writerow(item_row)
     
     def _tokenise(self, cell_value):
         return [v.strip() for v in cell_value.split("||")]
-        
+    
+    def _serialise(self, cell_values):
+        return "||".join(cell_values)
 
     ##########################################################
     # csv manipulation functions
