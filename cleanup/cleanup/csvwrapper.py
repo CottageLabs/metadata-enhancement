@@ -93,8 +93,17 @@ class CSVWrapper(object):
         """
         Apply the supplied function to every value in the supplied column
         """
-        pass
-        
+        for id in self.ids:
+            original_values = self.csv_dict[column][id]
+            new_values = []
+            for original_value in original_values:
+                #try:
+                new_value = fn(original_value)
+                new_values.append(new_value)
+                #except:
+                    # leave the value as is
+                    # new_values.append(original_value)
+            self.csv_dict[column][id] = new_values
         
     def delete_column(self, column):
         """

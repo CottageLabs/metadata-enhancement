@@ -114,8 +114,12 @@ def rule7a_date(csv_wrapper):
     # to form: 2010-11-10T10:09:17Z
     def date_converter(data):
         from datetime import datetime
-        dt = datetime.strptime(d, "%a, %d %b %Y %H:%M:%S +0100")
-        return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+        try:
+            dt = datetime.strptime(data, "%a, %d %b %Y %H:%M:%S +0100")
+            return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+        except ValueError:
+            # we couldn't convert the date, so leave it as is
+            return data
     csv_wrapper.apply_value_function("dc.date[]", date_converter)
 
 # 7.b. merge dc.date[] into dc.date
