@@ -105,19 +105,23 @@ class CSVWrapper(object):
             original_values = self.csv_dict[column][id]
             new_values = []
             for original_value in original_values:
-                #try:
                 new_value = fn(original_value)
                 if new_value: # leave out '', None and so on - a nice way to delete values
                     new_values.append(new_value)
-                #except:
-                    # leave the value as is
-                    # new_values.append(original_value)
             self.csv_dict[column][id] = new_values
     
     def apply_cell_function(self, column, fn):
         """
         Apply the supplied function to every cell in the supplied column (i.e. to
         the array of values in that cell as a whole, not the individual values)
+        """
+        pass
+    
+    def find_by_value_function(self, column, fn):
+        """
+        Apply the supplied function to every cell in the supplied column, and for
+        every cell where the function returns True, record the id, and return an
+        array of all matching ids.
         """
         pass
     
@@ -170,7 +174,7 @@ class CSVWrapper(object):
         # """
         # pass
     
-    # def set_contents(self, column, item_id, *values):
+    #def set_contents(self, column, item_id, *values):
         # """
         # Set the value of a cell to the specified value(s). The cell to be modified is specified by the column and Jorum item ID. Multiple values are allowed in the form of *args.
         # """

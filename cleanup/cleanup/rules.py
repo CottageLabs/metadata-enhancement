@@ -216,3 +216,32 @@ def rule7e_date(csv_wrapper):
 # 7.f. Delete dc.date.created[en] column
 def rule7f_date(csv_wrapper):
     csv_wrapper.delete_column("dc.date.created[en]")
+
+# 8. Description columns
+#############################################################
+
+# 8.a. delete dc.description.uri
+def rule8a_description(csv_wrapper):
+    csv_wrapper.delete_column("dc.description.uri")
+
+# 8.b. migrate dc.description[] and dc.description[en-gb] to dc.description[en]
+def rule8b_description(csv_wrapper):
+    csv_wrapper.merge_columns("dc.description[]", "dc.description[en]")
+    csv_wrapper.merge_columns("dc.description[en-gb]", "dc.description[en]")
+
+# 8.c. Validate content (check for short strings, starting with capital letters, etc)
+def rule8c_description(csv_wrapper):
+    def detect_oddities(value):
+        # check for capitalisation - surprisingly tricky
+        capitalised = value.split(" ")[0].istitle()
+        if not capitalised:
+            return True
+        # check for surprisingly short strings
+        if len(value) < 5:
+            return True
+        return False
+    
+    ids = csv_wrapper.find_by_value_function("dc.description[en]", detect_oddities)
+    csv_wrapper.add_column("note.dc.description[en]")
+    csv_wrapper.set_contents("note.dc.description[en]", ids, "possible issue")
+
