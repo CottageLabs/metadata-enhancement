@@ -48,6 +48,9 @@ else: # run all of the rules
     # Instead of defining manually, get all the functions defined by the rules 
     # module whose names start with "rule" in ALPHABETICAL order (fine for our 
     # module).
+    # FIXME: is this going to work when there are more than 10 rulesets, with the
+    # ASCIIBETICAL sorting that we'll get?  Note to self: check asciibetical sorting
+    # rules
     runrules = [ # Make a list of ..
         rules.__dict__.get(a) # .. the actual function objects corresponding to ..
         for a in dir(rules) # .. all names in the rules module ..

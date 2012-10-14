@@ -131,6 +131,12 @@ class CSVWrapper(object):
         """
         pass
         
+    def add_column(self, column):
+        """
+        Add a column with the given name
+        """
+        pass
+        
     def delete_record(self, item_id):
         """
         Delete a record (row) given the item_id of the item that's stored in the record.
@@ -164,6 +170,13 @@ class CSVWrapper(object):
         Deletes the contents of a cell specified by the column and Jorum item ID.
         """
         # Maybe do sth. like self.set_contents(column, item_id, '')
+        pass
+        
+    def set_value(self, column, item_ids, value):
+        """
+        set the value of a supplied column to the supplied value for the given
+        item ids
+        """
         pass
 
     # Deprecated method templates below - if found to be required, move above 

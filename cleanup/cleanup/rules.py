@@ -243,5 +243,96 @@ def rule8c_description(csv_wrapper):
     
     ids = csv_wrapper.find_by_value_function("dc.description[en]", detect_oddities)
     csv_wrapper.add_column("note.dc.description[en]")
-    csv_wrapper.set_contents("note.dc.description[en]", ids, "possible issue")
+    csv_wrapper.set_value("note.dc.description[en]", ids, "possible issue")
 
+# 9. Format columns
+############################################################
+
+# These need to be replaced with the values calculated directly from the DSpace database
+# FIXME: we need the source data first
+# copy(select item2bundle.item_id, bitstreamformatregistry.mimetype from bitstream join bundle2bitstream on bitstream.bitstream_id = bundle2bitstream.bitstream_id join item2bundle on bundle2bitstream.bundle_id = item2bundle.bundle_id join bitstreamformatregistry on bitstream.bitstream_format_id = bitstreamformatregistry.bitstream_format_id) to 'formats.csv' with csv header;
+
+# 10. Language columns
+#############################################################
+
+# 10.a. delete dc.language[x-none]
+def rule10a_language(csv_wrapper):
+    csv_wrapper.delete_column("dc.language[x-none]")
+
+# 10.b. merge all dc.language[*] to dc.language
+def rule10b_language(csv_wrapper):
+    # dc.language
+    # dc.language[]
+    # dc.language[de]
+    # dc.language[en-GB]
+    # dc.language[en-gb]
+    # dc.language[en]
+    # dc.language[fr]
+    csv_wrapper.merge_columns("dc.language[]", "dc.language")
+    csv_wrapper.merge_columns("dc.language[de]", "dc.language")
+    csv_wrapper.merge_columns("dc.language[en-GB]", "dc.language")
+    csv_wrapper.merge_columns("dc.language[en-gb]", "dc.language")
+    csv_wrapper.merge_columns("dc.language[en]", "dc.language")
+    csv_wrapper.merge_columns("dc.language[fr]", "dc.language")
+
+# 10.c. validate and convert all language codes to <two-letter>[-<two letter>] form
+
+# FIXME: Looking at the data, all the codes are two letters,
+# except for a bunch of en-gb or en-GB codes.  We can therefore easily normalise,
+# and use something like babel to validate the codes to make sure there are no 
+# oddities.
+
+# 11. Title columns
+#############################################################
+
+# 11.a. merge dc.title[*] to dc.title[en]
+def rule11a_title(csv_value):
+    csv_wrapper.merge_columns("dc.title[*]", "dc.title[en]")
+
+# 11.b. Validate content (check for short strings, starting with capital letters, etc)
+def rule10b_title(csv_wrapper):
+    def detect_oddities(value):
+        # check for capitalisation - surprisingly tricky
+        capitalised = value.split(" ")[0].istitle()
+        if not capitalised:
+            return True
+        # check for surprisingly short strings
+        if len(value) < 5:
+            return True
+        return False
+    
+    ids = csv_wrapper.find_by_value_function("dc.title[en]", detect_oddities)
+    csv_wrapper.add_column("note.dc.title[en]")
+    csv_wrapper.set_value("note.dc.title[en]", ids, "possible issue")
+    
+    
+# 12. Identifier columns:
+############################################################
+
+# 12.a. merge dc.identifier.uri, dc.identifier.uri[] and dc.identifier.uri[en]
+def rule12a_identifier(csv_wrapper):
+    csv_wrapper.merge_columns("dc.identifier.uri[]", "dc.identifier.uri")
+    csv_wrapper.merge_columns("dc.identifier.uri[en]", "dc.identifier.uri")
+
+# 13. Publisher columns:
+############################################################
+
+# 13.a. merge dc.publisher[*] into dc.publisher[en]
+def rule13a_publisher(csv_wrapper):
+    csv_wrapper.merge_columns("dc.publisher", "dc.publisher[en]")
+    csv_wrapper.merge_columns("dc.publisher[en-gb]", "dc.publisher[en]")
+
+# 13.b. auto-detect non-organisations names (e.g. “university”, “school”, etc) and flag for manual intervention
+def rule13b_publisher(csv_wrapper):
+    def detect_non_org(value):
+        if value == "":
+            return False
+        compare = value.lower()
+        if "university" in compare:
+            return False
+        if "school" in compare:
+            return False
+        return True
+    ids = csv_wrapper.find_by_value_function("dc.publisher[en]", detect_non_org)
+    csv_wrapper.add_column("note.dc.publisher[en]")
+    csv_wrapper.set_value("note.dc.publisher[en]", ids, "possible person name")
