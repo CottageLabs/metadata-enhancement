@@ -102,6 +102,17 @@ def rule2g_author(csv_wrapper):
 def rule3a_creator(csv_wrapper):
     csv_wrapper.merge_columns('dc.creator[]', 'dc.creator')
         
+# 3.b. split names separated by ";" into separate values
+def rule3b_creator(csv_wrapper):
+    def split_by_semicolon(data):
+        result = data.split(';')
+        # strip preceding/trailing whitespace and empty elements after the split
+        result = [clean_item for clean_item in [item.strip() for item in result] if clean_item]
+        result = csv_wrapper._serialise(result)
+        return result
+        
+    csv_wrapper.apply_value_function('dc.creator', split_by_semicolon)
+    
 # 7. Date columns
 ###########################################################
 
