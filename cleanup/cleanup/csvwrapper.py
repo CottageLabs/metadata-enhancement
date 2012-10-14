@@ -59,7 +59,7 @@ class CSVWrapper(object):
         """
         Save the self.csv_dict as a csv file to the supplied file path
         """
-        with open(path, "w") as f:
+        with open(path, "wb") as f:
             writer = csv.writer(f)
             
             # first, the headers
