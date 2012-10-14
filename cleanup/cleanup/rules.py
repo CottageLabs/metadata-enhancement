@@ -120,7 +120,55 @@ def rule7a_date(csv_wrapper):
     csv_wrapper.apply_value_function("dc.date[]", date_converter)
 
 # 7.b. merge dc.date[] into dc.date
+def rule7b_date(csv_wrapper):
+    csv_wrapper.merge_columns("dc.date[]", "dc.date")
+
 # 7.c. merge dc.date.accessioned[*] into dc.date.accessioned
-# 7.d. merge dc.date.issued[en] into to dc.date.issued
+# FIXME: this data does not seem to be present in the latest metadata export
+def rule7c_date(csv_wrapper):
+    pass
+
+# 7.d. merge dc.date.issued[] into to dc.date.issued
+def rule7d_date(csv_wrapper):
+    csv_wrapper.merge_columns("dc.date.issued[]", "dc.date.issued")
+
 # 7.e. ensure that all dc.date.* fields have only one value; propose to keep the oldest value, where there is more than one
+def rule7e_date(csv_wrapper):
+    def date_reduce(values):
+        """ reduce the list of date values to one date - the oldest """
+        from datetime import datetime
+        # if there is only one value, no need to do more
+        if len(values) <= 1:
+            return values
+        dts = []
+        for value in values:
+            try:
+                dt = datetime.strptime(value, "%Y-%m-%dT%H:%M:%SZ")
+                dts.append(dt)
+            except ValueError:
+                # if we can't parse all of the dates, we might as well stop
+                return values
+        # figure out the oldest date from the list
+        oldest = dts[0]
+        for i in range(1, len(dts)):
+            if oldest > dts[i]:
+                oldest = dts[i]
+        return [oldest]
+        
+    # possible date fields:
+    # dc.date
+    # dc.date.created
+    # dc.date.created[en]
+    # dc.date.issued
+    # dc.date.issued[]
+    # dc.date[]
+    csv_wrapper.apply_cell_function("dc.date", date_reduce)
+    csv_wrapper.apply_cell_function("dc.date.created", date_reduce)
+    csv_wrapper.apply_cell_function("dc.date.created[en]", date_reduce)
+    csv_wrapper.apply_cell_function("dc.date.issued", date_reduce)
+    csv_wrapper.apply_cell_function("dc.date.issued[]", date_reduce)
+    csv_wrapper.apply_cell_function("dc.date[]", date_reduce)
+
 # 7.f. Delete dc.date.created[en] column
+def rule7f_date(csv_wrapper):
+    csv_wrapper.delete_column("dc.date.created[en]")

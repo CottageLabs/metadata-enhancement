@@ -97,7 +97,9 @@ class CSVWrapper(object):
     
     def apply_value_function(self, column, fn):
         """
-        Apply the supplied function to every value in the supplied column
+        Apply the supplied function to every value in each of the cells the supplied column
+        (i.e. if there are more than one value in the cell, apply the function independently
+        to each value)
         """
         for id in self.ids:
             original_values = self.csv_dict[column][id]
@@ -110,7 +112,14 @@ class CSVWrapper(object):
                     # leave the value as is
                     # new_values.append(original_value)
             self.csv_dict[column][id] = new_values
-        
+    
+    def apply_cell_function(self, column, fn):
+        """
+        Apply the supplied function to every cell in the supplied column (i.e. to
+        the array of values in that cell as a whole, not the individual values)
+        """
+        pass
+    
     def delete_column(self, column):
         """
         Delete a column from the dataset with all its data.
