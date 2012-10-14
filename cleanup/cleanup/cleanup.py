@@ -2,6 +2,7 @@
 Controlling class for applying metadata cleanup rules to the 
 csv
 """
+
 import sys, types
 from csvwrapper import CSVWrapper
 import rules
@@ -39,11 +40,16 @@ runrules = []
 if RULE is not None:
     runrules.append(rules.__dict__.get(RULE))
 else:
-    # instead of defining manually, get all the functions defined by the rules module (they will be ordered as they are defined in the rules source)
-    # see http://stackoverflow.com/questions/139180/listing-all-functions-in-a-python-module#answer-139258 
-    runrules = [rules.__dict__.get(a) for a in dir(rules)
-      if isinstance(rules.__dict__.get(a), types.FunctionType)]
-
+    # Instead of defining manually, get all the functions defined by the rules 
+    # module whose names start with "rule" in ALPHABETICAL order (fine for our 
+    # module).
+    runrules = [ # Make a list of ..
+        rules.__dict__.get(a) # .. the actual function objects corresponding to ..
+        for a in dir(rules) # .. all names in the rules module ..
+        if a.startswith('rule') # .. which start with "rule" ..
+        and isinstance(rules.__dict__.get(a), types.FunctionType) # .. and represent a function.
+        ]  
+  
 # load the csv
 csv_wrapper = CSVWrapper(CSV)
 

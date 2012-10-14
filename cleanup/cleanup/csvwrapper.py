@@ -108,9 +108,9 @@ class CSVWrapper(object):
         """
         pass
         
-    def find_in_column(self, column, search_for):
+    def find_in_column(self, column, search_for, partial = False):
         """
-        Find all records which contain the specified value in the specified column and return a list of the matching Jorum item ID-s.
+        Find all records which contain the specified value in the specified column and return a list of the matching Jorum item ID-s. Pass partial = True to get it to return records whose values only partially match the search term.
         """
         return []
         
@@ -123,15 +123,28 @@ class CSVWrapper(object):
             The second column is the one that will end up with all the data - the one you are merging *into*. After a successful merge, it will have the data from both columns.
         """
         pass
-        
-    def set_value(self, column, item_id, *values):
+    
+    def get_contents(self, column, item_id):
+        """
+        Get the contents of a cell identified by the column and Jorum item ID.
+        """
+        pass
+    
+    def set_contents(self, column, item_id, *values):
         """
         Set the value of a cell to the specified value(s). The cell to be modified is specified by the column and Jorum item ID. Multiple values are allowed in the form of *args.
         """
         pass
         
-    def delete_value(self, column, item_id):
+    def add_value(self, column, item_id, *values):
+        """
+        Add the specified value(s) to the existing contents of the cell. The cell to be modified is specified by the column and Jorum item ID. Multiple values are allowed in the form of *args.
+        """
+        pass
+        
+    def delete_contents(self, column, item_id):
         """
         Deletes the contents of a cell specified by the column and Jorum item ID.
         """
-        self.set_value(column, item_id, '')
+        # Maybe do sth. like self.set_contents(column, item_id, '')
+        pass
