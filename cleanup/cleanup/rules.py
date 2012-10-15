@@ -2,6 +2,7 @@
 A set of rules implemented over the CSVWrapper which manage the
 metadata cleanup tasks
 """
+
 # 1. Advisor columns
 ###########################################################
 
@@ -332,7 +333,75 @@ def rule13b_publisher(csv_wrapper):
             return False
         if "school" in compare:
             return False
+        if "college" in compare:
+            return False
         return True
     ids = csv_wrapper.find_by_value_function("dc.publisher[en]", detect_non_org)
     csv_wrapper.add_column("note.dc.publisher[en]")
     csv_wrapper.set_value("note.dc.publisher[en]", ids, "possible person name")
+
+# 14. General tidying
+###########################################################
+
+# 14.a. delete the contents of all fields where the only value in the field is 
+# “||”, the multiple value separator
+# 14.b. for all fields with multiple values, de-duplicate repeated values
+# this rule should cover both of these ...
+def rule14a_general(csv_wrapper):
+    csv_wrapper.deduplicate_values()
+
+# 14.c. auto-detect and flag instances of “university”, “institution”, 
+# “school”, "college" etc, and report on the rows where these occur, for possible 
+# manual intervention
+def rule14c_general(csv_wrapper):
+    # dc.contributor.author[en]
+    # dc.subject
+    # dc.contributor[en]
+    # dc.creator
+    def detect_org(value):
+        if value == "":
+            return False
+        compare = value.lower()
+        if "university" in compare:
+            return True
+        if "school" in compare:
+            return True
+        if "college" in compare:
+            return True
+        return False
+    ids1 = csv_wrapper.find_by_value_function("dc.contributor.author[en]", detect_org)
+    ids2 = csv_wrapper.find_by_value_function("dc.subject", detect_org)
+    ids3 = csv_wrapper.find_by_value_function("dc.contributor[en]", detect_org)
+    ids4 = csv_wrapper.find_by_value_function("dc.creator", detect_org)
+    ids = ids1 + [x for x in ids2 if x not in ids1]
+    ids = ids + [x for x in ids3 if x not in ids]
+    ids = ids + [x for x in ids4 if x not in ids]
+    csv_wrapper.add_column("note.organisations")
+    csv_wrapper.set_value("note.organisations", ids, "possible org name")
+
+# 14.d. detect and delete all e-mail addresses (have a way to check it’s a safe delete first)
+def rule14d_general(csv_wrapper):
+    def strip_email(value):
+        import re
+        x = "[a-Z0-9._%+-]+@[a-Z0-9.-]+\.[a-Z]{2,4}"
+        if re.match(x, value) is not None:
+            return None
+        return value
+    csv_wrapper.apply_global_value_function(strip_email)
+
+# 14.e. detect subject keywords which are suspiciously long
+def rule14e_general(csv_wrapper):
+    def detect_long(values):
+        if len(values) != 1:
+            return False
+        if len(values[0]) > 30: # that would be a pretty long keyword
+            return True
+        return False
+    ids = csv_wrapper.find_by_value_function("dc.subject", detect_long)
+    csv_wrapper.add_column("note.dc.subject")
+    csv_wrapper.set_value("note.dc.subject", ids, "long subject")
+
+# 14.f. auto-detect items which would have the defunct “Mathematical and Computer Science” JACS code
+# FIXME: do we still need this?
+def rule14f_general(csv_wrapper):
+    pass

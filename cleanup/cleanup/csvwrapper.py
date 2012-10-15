@@ -110,6 +110,12 @@ class CSVWrapper(object):
                     new_values.append(new_value)
             self.csv_dict[column][id] = new_values
     
+    def apply_global_value_function(self, fn):
+        """
+        apply the supplied function to every value in every cell in the whole document
+        """
+        pass
+    
     def apply_cell_function(self, column, fn):
         """
         Apply the supplied function to every cell in the supplied column (i.e. to
