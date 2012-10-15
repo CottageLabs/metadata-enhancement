@@ -6,10 +6,13 @@ import csv
 
 class CSVWrapper(object):
 
-    def __init__(self, csv_file_path):
-        self.source_csv_path = csv_file_path
-        self.populate_csv_dict()
-        self.populate_ids()
+    def __init__(self, csv_file_path=None):
+        self.csv_dict = None
+        self.ids = None
+        if csv_file_path is not None:
+            self.source_csv_path = csv_file_path
+            self.populate_csv_dict()
+            self.populate_ids()
     
     ##########################################################
     # initialisation functions
@@ -100,7 +103,12 @@ class CSVWrapper(object):
         Apply the supplied function to every value in each of the cells the supplied column
         (i.e. if there are more than one value in the cell, apply the function independently
         to each value)
+        
+        The value function (fn) MUST either return the original value or a modified
+        value.  If it does not return, then the original value will be lost
         """
+        if not self.csv_dict.has_key(column):
+            return
         for id in self.ids:
             original_values = self.csv_dict[column][id]
             new_values = []
@@ -114,14 +122,20 @@ class CSVWrapper(object):
         """
         apply the supplied function to every value in every cell in the whole document
         """
-        pass
+        for column in self.csv_dict.keys():
+            self.apply_value_function(self, column, fn)
     
     def apply_cell_function(self, column, fn):
         """
         Apply the supplied function to every cell in the supplied column (i.e. to
         the array of values in that cell as a whole, not the individual values)
         """
-        pass
+        if not self.csv_dict.has_key(column):
+            return
+        for id in self.ids:
+            original_values = self.csv_dict[column][id]
+            new_values = fn(original_values)
+            self.csv_dict[column][id] = new_values
     
     def find_by_value_function(self, column, fn):
         """
@@ -129,61 +143,133 @@ class CSVWrapper(object):
         every cell where the function returns True, record the id, and return an
         array of all matching ids.
         """
-        pass
+        if not self.csv_dict.has_key(column):
+            return
+        found = []
+        for id in self.ids:
+            values = self.csv_dict[column][id]
+            for value in values:
+                if fn(value):
+                    found.append(id)
+        return found
     
     def delete_column(self, column):
         """
         Delete a column from the dataset with all its data.
         """
-        pass
+        if not self.csv_dict.has_key(column):
+            return
+        del self.csv_dict[column]
         
     def add_column(self, column):
         """
         Add a column with the given name
         """
-        pass
+        if self.csv_dict.has_key(column):
+            return
+        self.csv_dict[column] = {}
         
     def delete_record(self, item_id):
         """
         Delete a record (row) given the item_id of the item that's stored in the record.
         """
-        pass
+        for column in self.csv_dict.keys():
+            if self.csv_dict[column].has_key(item_id):
+                del self.csv_dict[column][item_id]
         
     def find_in_column(self, column, search_for, partial = False):
         """
-        Find all records which contain the specified value in the specified column and return a list of the matching Jorum item ID-s. Pass partial = True to get it to return records whose values only partially match the search term.
+        Find all records which contain the specified value in the specified column 
+        and return a list of the matching Jorum item ID-s. Pass partial = True to 
+        get it to return records whose values only partially match the search term.
         """
-        return []
+        if not self.csv_dict.has_key(column):
+            return []
+        found = []
+        for id in self.ids:
+            values = self.csv_dict[column][id]
+            for value in values:
+                if partial:
+                    if search_for in value:
+                        found.append(id)
+                else:
+                    if search_for == value:
+                        found.append(id)
+        return found
         
     def merge_columns(self, src, dst):
         """
-        Merges two CSV columns. If there are overlapping values, the fields are concatenated (i.e. non-destructive merging - no data is overwritten).
+        Merges two CSV columns. If there are overlapping values, the fields are 
+        concatenated (i.e. non-destructive merging - no data is overwritten).
         
         Takes two column names as its two parameters.
-            The first column is the one that you want to try to merge with the second one. The first column will be deleted after a successful merge.
-            The second column is the one that will end up with all the data - the one you are merging *into*. After a successful merge, it will have the data from both columns.
+            The first column is the one that you want to try to merge with the 
+                second one. The first column will be deleted after a successful 
+                merge.
+            The second column is the one that will end up with all the data - 
+                the one you are merging *into*. After a successful merge, it will 
+                have the data from both columns.
         """
-        pass
+        if not self.csv_dict.has_key(src) or not self.csv_dict.has_key(dst):
+            return
         
+        for id in self.ids:
+            src_values = self.csv_dict[src][id]
+            dst_values = self.csv_dict[dst][id]
+            merged_values = self._combine(src_values, dst_values)
+            self.csv_dict[dst][id] = merged_values
+        
+        self.delete_column(src)
+    
+    def _combine(self, src_values, dst_values):
+        src_norm = []
+        map = {}
+        for v in src_values:
+            src_norm.append(v.lower())
+            map[v.lower()] = v
+        
+        dst_norm = []
+        map = {}
+        for v in dst_values:
+            dst_norm.append(v.lower())
+            map[v.lower()] = v
+        
+        norm_result = dst_norm + [a for a in src_norm if a not in dst_norm]
+        result = [map.get(r) for r in norm_result]
+        return result
+    
     def add_value(self, column, item_id, *values):
         """
-        Add the specified value(s) to the existing contents of the cell. The cell to be modified is specified by the column and Jorum item ID. Multiple values are allowed in the form of *args.
+        Add the specified value(s) to the existing contents of the cell. 
+        The cell to be modified is specified by the column and Jorum item 
+        ID. Multiple values are allowed in the form of *args.
         """
-        pass
+        if not self.csv_dict.has_key(column) or not self.csv_dict[column].has_key(item_id):
+            return
+        existing_values = self.csv_dict[column][item_id]
+        new_values = self._combine(values, existing_values)
+        self.csv_dict[column][id] = new_values
         
     def delete_contents(self, column, item_id):
         """
         Deletes the contents of a cell specified by the column and Jorum item ID.
         """
         # Maybe do sth. like self.set_contents(column, item_id, '')
-        pass
+        if not self.csv_dict.has_key(column) or not self.csv_dict[column].has_key(item_id):
+            return
+        self.csv_dict[column][item_id] = ['']
         
     def set_value(self, column, item_ids, value):
         """
         set the value of a supplied column to the supplied value for the given
-        item ids
+        item ids (an array)
         """
-        pass
+        if not self.csv_dict.has_key(column):
+            return
+        for id in item_ids:
+            if not self.csv_dict[column].has_key(id):
+                continue
+            self.csv_dict[column][id] = [value]
 
     # Deprecated method templates below - if found to be required, move above 
     # this line and uncomment.
