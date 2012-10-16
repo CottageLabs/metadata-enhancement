@@ -173,9 +173,15 @@ class CSVWrapper(object):
         """
         Delete a record (row) given the item_id of the item that's stored in the record.
         """
+        key_existed = False
+        
         for column in self.csv_dict.keys():
             if self.csv_dict[column].has_key(item_id):
+                key_existed = True
                 del self.csv_dict[column][item_id]
+        
+        if key_existed:
+            self.ids.remove(item_id)
         
     def find_in_column(self, column, search_for, partial = False):
         """
