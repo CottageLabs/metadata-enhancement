@@ -46,13 +46,13 @@ def rule1b_advisor(csv_wrapper):
     # 1.b.ii. DiPEX (x1) -> dc.publisher (as DIPEx)
     item_ids = csv_wrapper.find_in_column(working_on, 'DiPEX')
     for item_id in item_ids:
-        csv_wrapper.add_value('dc.publisher', item_id, 'DIPEx')
+        csv_wrapper.add_value('dc.publisher[en]', item_id, 'DIPEx')
         csv_wrapper.delete_contents(working_on, item_id)
     
     # 1.b.iii. iCase bioukoer (x3) -> dc.subject, split by whitespace, add ukoer to subject also
     item_ids = csv_wrapper.find_in_column(working_on, 'iCase bioukoer')
     for item_id in item_ids:
-        csv_wrapper.add_value('dc.subject[en]', item_id, ['iCase', 'bioukoer', 'ukoer'])
+        csv_wrapper.add_value('dc.subject[en]', item_id, *['iCase', 'bioukoer', 'ukoer'])
         csv_wrapper.delete_contents(working_on, item_id)
     
     # 1.b.iv. Rong Yang (x1) -> move to dc.contributor.author[en]
@@ -76,13 +76,13 @@ def rule1c_advisor(csv_wrapper):
 # 2. Author column group
 ###########################################################
 
-# 2.a. merge dc.contributor.author[] into dc.contributor.author
+# 2.a. merge dc.contributor.author[] into dc.contributor.author[en]
 def rule2a_author(csv_wrapper):
-    csv_wrapper.merge_columns('dc.contributor.author[]', 'dc.contributor.author')
+    csv_wrapper.merge_columns('dc.contributor.author[]', 'dc.contributor.author[en]')
 
-# 2.b. merge dc.contributor.author[x-none] into dc.contributor.author
+# 2.b. merge dc.contributor.author[x-none] into dc.contributor.author[en]
 def rule2b_author(csv_wrapper):
-    csv_wrapper.merge_columns('dc.contributor.author[x-none]', 'dc.contributor.author')
+    csv_wrapper.merge_columns('dc.contributor.author[x-none]', 'dc.contributor.author[en]')
 
 # 2.c. merge dc.contributor.author into dc.contributor.author[en]
 def rule2c_author(csv_wrapper):
@@ -118,7 +118,7 @@ def rule2g_author(csv_wrapper):
         else:
             return data
         
-    csv_wrapper.apply_value_function('dc.contributor.author[x-none]', replace_vcard)
+    csv_wrapper.apply_value_function('dc.contributor.author[en]', replace_vcard)
     
 # 3. Creator column group
 ###########################################################

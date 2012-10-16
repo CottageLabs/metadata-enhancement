@@ -61,7 +61,15 @@ else: # run all of the rules
                 if a.startswith('rule' + str(rule_no) + letter) and isinstance(rules.__dict__.get(a), types.FunctionType):
                     
                     runrules.append(rules.__dict__.get(a))
-    
+
+# For the moment, manually code the rules
+runrules = [
+    rules.rule1a_advisor, rules.rule1b_advisor, rules.rule1c_advisor, # deal with the advisor column group
+    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author,  # deal with the author column group
+    rules.rule2d_author, rules.rule2e_author, rules.rule2f_author,  #
+    rules.rule2g_author                                             #
+    ]
+
 # load the csv
 print "Loading csv from " + CSV + " ..."
 csv_wrapper = CSVWrapper(CSV)
