@@ -3,6 +3,8 @@ A set of rules implemented over the CSVWrapper which manage the
 metadata cleanup tasks
 """
 
+import re
+
 # 1. Advisor columns
 ###########################################################
 
@@ -120,11 +122,11 @@ def rule3b_creator(csv_wrapper):
 # 4.a. Detect all email addresses in dc.contributor and remove
 def rule4a_contributor(csv_wrapper):
     def is_email_address(str):
-    r = re.compile('[^@]+@[^@]+\.[^@]+')
-    if r.match(str):
-        return True
-    else:
-        return False
+        r = re.compile('[^@]+@[^@]+\.[^@]+')
+        if r.match(str):
+            return True
+        else:
+            return False
         
     def delete_emails(data):
         if is_email_address(data):
@@ -147,6 +149,84 @@ def rule4b_contributor(csv_wrapper):
 def rule4c_contributor(csv_wrapper):
     csv_wrapper.merge_columns('dc.contributor[x-none]', 'dc.publisher[en]')
     
+# 5. Subject column group
+###########################################################
+
+# 5.a. Merge all dc.subject[*] fields into dc.subject[en]
+def rule5a_subject(csv_wrapper):
+    csv_wrapper.merge_columns('dc.subject[EN]', 'dc.subject[en]')
+    csv_wrapper.merge_columns('dc.subject[]', 'dc.subject[en]')
+    csv_wrapper.merge_columns('dc.subject[en-gb]', 'dc.subject[en]')
+    csv_wrapper.merge_columns('dc.subject[ene]', 'dc.subject[en]')
+
+# 5.b. Merge dc.contributor.other[en] into dc.subject[en]
+def rule5b_subject(csv_wrapper):
+    csv_wrapper.merge_columns('dc.contributor.other[en]', 'dc.subject[en]')
+
+# 5.c. Merge dc.subject.classification[] into dc.subject.classification[en]
+def rule5c_subject(csv_wrapper):
+    csv_wrapper.merge_columns('dc.subject.classification[]', 'dc.subject.classification[en]')
+
+# 5.d. merge dc.description.sponsorship into dc.subject[en]
+def rule5d_subject(csv_wrapper):
+    csv_wrapper.merge_columns('dc.description.sponsorship', 'dc.subject[en]')
+
+# 5.e. normalise subject keywords
+# only one subject column left at this point: dc.subject[en]
+def rule5e_subject(csv_wrapper):
+    # 5.e.i. normalise spacing
+    # 5.e.ii. strip quotes
+    # 5.e.iii. to lower case
+    def normalise_keywords(data):
+        # normalise spacing
+        result = ' '.join(data.split())
+        
+        # strip quotes
+        stripchars = ['"']
+        # "smart" quotes
+        stripchars.append(u'\u201c'.encode('utf-8')) 
+        stripchars.append(u'\u201d'.encode('utf-8'))
+        
+        for char in stripchars:
+            result = result.replace(char, '')
+            
+        # to lower case
+        # NOTE: This will probably mess up Unicode data as it is.
+        result = result.lower()
+        
+        return result
+    
+    csv_wrapper.apply_value_function("dc.subject[en]", normalise_keywords)
+
+# 5.f. for all fields with a single value (i.e. no || in the field), detect and split on "," and ";"
+# only one subject column left at this point: dc.subject[en]
+# NOTE: implementing this for all values in all fields in Subject, not just single-valued ones
+def rule5f_subject(csv_wrapper):
+    def clean_list(list):
+    # strip whitespace off both ends and remove empty elements from the list
+        return [clean_item for clean_item in [item.strip() for item in list] if clean_item]
+    
+    def fix_multival(data):
+        splitchars = [',', ';']
+        for char in splitchars:
+            result = '||'.join(clean_list(data.split(char)))
+        
+        return result
+    
+    csv_wrapper.apply_value_function("dc.subject[en]", fix_multival)
+
+# 6. Coverage column group
+###########################################################
+
+# 6.a. delete dc.coverage.temporal[en]
+def rule6a_coverage(csv_wrapper):
+    csv_wrapper.delete_column("dc.coverage.temporal[en]")
+    
+# 6.b. delete dc.coverage.spatial[en]
+def rule6b_coverage(csv_wrapper):
+    csv_wrapper.delete_column("dc.coverage.spatial[en]")
+
+
 # 7. Date columns
 ###########################################################
 
@@ -218,7 +298,7 @@ def rule7e_date(csv_wrapper):
 def rule7f_date(csv_wrapper):
     csv_wrapper.delete_column("dc.date.created[en]")
 
-# 8. Description columns
+# 8. Description columns
 #############################################################
 
 # 8.a. delete dc.description.uri
@@ -287,11 +367,11 @@ def rule10b_language(csv_wrapper):
 #############################################################
 
 # 11.a. merge dc.title[*] to dc.title[en]
-def rule11a_title(csv_value):
+def rule11a_title(csv_wrapper):
     csv_wrapper.merge_columns("dc.title[*]", "dc.title[en]")
 
 # 11.b. Validate content (check for short strings, starting with capital letters, etc)
-def rule10b_title(csv_wrapper):
+def rule11b_title(csv_wrapper):
     def detect_oddities(value):
         # check for capitalisation - surprisingly tricky
         capitalised = value.split(" ")[0].istitle()
@@ -323,7 +403,7 @@ def rule13a_publisher(csv_wrapper):
     csv_wrapper.merge_columns("dc.publisher", "dc.publisher[en]")
     csv_wrapper.merge_columns("dc.publisher[en-gb]", "dc.publisher[en]")
 
-# 13.b. auto-detect non-organisations names (e.g. “university”, “school”, etc) and flag for manual intervention
+# 13.b. auto-detect non-organisations names (e.g. "university", "school", etc) and flag for manual intervention
 def rule13b_publisher(csv_wrapper):
     def detect_non_org(value):
         if value == "":

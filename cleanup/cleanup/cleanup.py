@@ -3,7 +3,7 @@ Controlling class for applying metadata cleanup rules to the
 csv
 """
 
-import sys, types
+import sys, types, string
 from csvwrapper import CSVWrapper
 import rules
 
@@ -51,13 +51,17 @@ else: # run all of the rules
     # FIXME: is this going to work when there are more than 10 rulesets, with the
     # ASCIIBETICAL sorting that we'll get?  Note to self: check asciibetical sorting
     # rules
-    runrules = [ # Make a list of ..
-        rules.__dict__.get(a) # .. the actual function objects corresponding to ..
-        for a in dir(rules) # .. all names in the rules module ..
-        if a.startswith('rule') # .. which start with "rule" ..
-        and isinstance(rules.__dict__.get(a), types.FunctionType) # .. and represent a function.
-        ]  
-
+    # FIXME: No, you're right, it starts from 10, goes to 11, just amazing. 
+    # Implemented a "solution" below. At least they'll run in order now, even 
+    # though it's ugly. Format is: rule<rule_no><sub_rule_letter>
+    
+    for rule_no in range(1,16): # 1 to 15 (incl. 15)
+        for letter in string.ascii_lowercase:
+            for a in dir(rules):
+                if a.startswith('rule' + str(rule_no) + letter) and isinstance(rules.__dict__.get(a), types.FunctionType):
+                    
+                    runrules.append(rules.__dict__.get(a))
+    
 # load the csv
 print "Loading csv from " + CSV + " ..."
 csv_wrapper = CSVWrapper(CSV)
