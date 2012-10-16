@@ -10,12 +10,14 @@ def clean_list(list):
     # strip whitespace off both ends and remove empty elements from the list
     return [clean_item for clean_item in [item.strip() for item in list] if clean_item]
 
-def strip_email(value):
+def strip_email(values):
     import re
-    x = "[a-Z0-9._%+-]+@[a-Z0-9.-]+\.[a-Z]{2,4}"
-    if re.match(x, value) is not None:
-        return None
-    return value
+    x = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}"
+    new_values = []
+    for value in values:
+        if re.match(x, value) is None:
+            new_values.append(value)
+    return new_values
 
 def detect_oddities(value):
     # check for capitalisation - surprisingly tricky
@@ -129,21 +131,23 @@ def rule3a_creator(csv_wrapper):
         
 # 3.b. split names separated by ";" into separate values
 def rule3b_creator(csv_wrapper):
-    def split_by_semicolon(data):
-        result = data.split(';')
-        # strip preceding/trailing whitespace and empty elements after the split
-        result = [clean_item for clean_item in [item.strip() for item in result] if clean_item]
-        result = csv_wrapper._serialise(result)
-        return result
+    def split_by_semicolon(values):
+        new_values = []
+        for value in values:
+            results = value.split(';')
+            # strip preceding/trailing whitespace and empty elements after the split
+            results = [clean_item.strip() for clean_item in results if clean_item]
+            new_values += results
+        return new_values
         
-    csv_wrapper.apply_value_function('dc.creator', split_by_semicolon)
+    csv_wrapper.apply_cell_function('dc.creator', split_by_semicolon)
     
 # 4. Contributor column group
 ###########################################################
 
 # 4.a. Detect all email addresses in dc.contributor and remove
 def rule4a_contributor(csv_wrapper):
-    csv_wrapper.apply_value_function('dc.contributor', strip_email)
+    csv_wrapper.apply_cell_function('dc.contributor', strip_email)
     
 # 4.b. Move all non-email addresses from dc.contributor to dc.publisher[en]
 # Previous rule 4.a. should have removed all e-mail addresses, so we basically

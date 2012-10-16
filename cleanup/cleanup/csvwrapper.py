@@ -116,6 +116,8 @@ class CSVWrapper(object):
                 new_value = fn(original_value)
                 if new_value: # leave out '', None and so on - a nice way to delete values
                     new_values.append(new_value)
+            if len(new_values) == 0:
+                new_values = ['']
             self.csv_dict[column][id] = new_values
     
     def apply_global_value_function(self, fn):
@@ -135,6 +137,8 @@ class CSVWrapper(object):
         for id in self.ids:
             original_values = self.csv_dict[column][id]
             new_values = fn(original_values)
+            if len(new_values) == 0:
+                new_values = ['']
             self.csv_dict[column][id] = new_values
     
     def find_by_value_function(self, column, fn):

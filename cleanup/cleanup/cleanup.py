@@ -67,7 +67,9 @@ runrules = [
     rules.rule1a_advisor, rules.rule1b_advisor, rules.rule1c_advisor, # deal with the advisor column group
     rules.rule2a_author, rules.rule2b_author, rules.rule2c_author,  # deal with the author column group
     rules.rule2d_author, rules.rule2e_author, rules.rule2f_author,  #
-    rules.rule2g_author                                             #
+    rules.rule2g_author,                                            #
+    rules.rule3a_creator, rules.rule3b_creator,  # deal with creator column group
+    rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor # contributor column group
     ]
 
 # load the csv

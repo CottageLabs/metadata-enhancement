@@ -16,7 +16,14 @@ data = {
     'dc.contributor.author[en]' : {1 : [""], 2: [""], 3: [''], 4: ['contributor'], 5: ['Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard'], 6: [''], 7: ['']},
     'dc.contributor.author[English]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[en-gb]' : {1 : ["publisher1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    'dc.publisher[en]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']}
+    'dc.publisher[en]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    
+    'dc.creator[]' : {1 : ["creator1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.creator' : {1 : [""], 2: ["creator2; creator3"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    
+    'dc.contributor' : {1 : ["test@test.com", "bob@example.com"], 2: ["University of Somewhere"], 3: ['alice@example.com'], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.contributor[x-none]' : {1 : ["University of Over There"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+
 }
 
 wrapper = csvwrapper.CSVWrapper()
@@ -121,3 +128,45 @@ class TestRules(unittest.TestCase):
         rules.rule2g_author(w)
         
         assert w.csv_dict['dc.contributor.author[en]'][5][0] == "Mark Foss"
+    
+    def test_3a_creator(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule3a_creator(w)
+        
+        assert "creator1" in w.csv_dict['dc.creator'][1]
+        assert not w.csv_dict.has_key('dc.creator[]')
+        
+    def test_3b_creator(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule3b_creator(w)
+        
+        assert "creator2" in w.csv_dict['dc.creator'][2], w.csv_dict['dc.creator']
+        assert "creator3" in w.csv_dict['dc.creator'][2]
+    
+    def test_4a_contributor(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule4a_contributor(w)
+        
+        assert len(w.csv_dict['dc.contributor'][1]) == 1, w.csv_dict['dc.contributor']
+        assert w.csv_dict['dc.contributor'][1][0] == ""
+        assert w.csv_dict['dc.contributor'][2][0] == "University of Somewhere"
+        assert w.csv_dict['dc.contributor'][3][0] == ""
+    
+    def test_4b_contributor(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule4b_contributor(w)
+        
+        assert "University of Somewhere" in w.csv_dict['dc.publisher[en]'][2]
+        assert not w.csv_dict.has_key('dc.contributor')
+        
+    def test_4c_contributor(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule4c_contributor(w)
+        
+        assert "University of Over There" in w.csv_dict['dc.publisher[en]'][1]
+        assert not w.csv_dict.has_key('dc.contributor[x-none]')
