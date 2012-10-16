@@ -3,8 +3,30 @@ A set of rules implemented over the CSVWrapper which manage the
 metadata cleanup tasks
 """
 
-import re
+# Functions shared between different rules
+###########################################################
 
+def clean_list(list):
+    # strip whitespace off both ends and remove empty elements from the list
+    return [clean_item for clean_item in [item.strip() for item in list] if clean_item]
+
+def strip_email(value):
+    import re
+    x = "[a-Z0-9._%+-]+@[a-Z0-9.-]+\.[a-Z]{2,4}"
+    if re.match(x, value) is not None:
+        return None
+    return value
+
+def detect_oddities(value):
+    # check for capitalisation - surprisingly tricky
+    capitalised = value.split(" ")[0].istitle()
+    if not capitalised:
+        return True
+    # check for surprisingly short strings
+    if len(value) < 5:
+        return True
+    return False
+        
 # 1. Advisor columns
 ###########################################################
 
@@ -121,20 +143,7 @@ def rule3b_creator(csv_wrapper):
 
 # 4.a. Detect all email addresses in dc.contributor and remove
 def rule4a_contributor(csv_wrapper):
-    def is_email_address(str):
-        r = re.compile('[^@]+@[^@]+\.[^@]+')
-        if r.match(str):
-            return True
-        else:
-            return False
-        
-    def delete_emails(data):
-        if is_email_address(data):
-            return None
-        else:
-            return data
-    
-    csv_wrapper.apply_value_function('dc.contributor', delete_emails)
+    csv_wrapper.apply_value_function('dc.contributor', strip_email)
     
 # 4.b. Move all non-email addresses from dc.contributor to dc.publisher[en]
 # Previous rule 4.a. should have removed all e-mail addresses, so we basically
@@ -202,9 +211,6 @@ def rule5e_subject(csv_wrapper):
 # only one subject column left at this point: dc.subject[en]
 # NOTE: implementing this for all values in all fields in Subject, not just single-valued ones
 def rule5f_subject(csv_wrapper):
-    def clean_list(list):
-    # strip whitespace off both ends and remove empty elements from the list
-        return [clean_item for clean_item in [item.strip() for item in list] if clean_item]
     
     def fix_multival(data):
         splitchars = [',', ';']
@@ -312,16 +318,6 @@ def rule8b_description(csv_wrapper):
 
 # 8.c. Validate content (check for short strings, starting with capital letters, etc)
 def rule8c_description(csv_wrapper):
-    def detect_oddities(value):
-        # check for capitalisation - surprisingly tricky
-        capitalised = value.split(" ")[0].istitle()
-        if not capitalised:
-            return True
-        # check for surprisingly short strings
-        if len(value) < 5:
-            return True
-        return False
-    
     ids = csv_wrapper.find_by_value_function("dc.description[en]", detect_oddities)
     csv_wrapper.add_column("note.dc.description[en]")
     csv_wrapper.set_value("note.dc.description[en]", ids, "possible issue")
@@ -372,16 +368,6 @@ def rule11a_title(csv_wrapper):
 
 # 11.b. Validate content (check for short strings, starting with capital letters, etc)
 def rule11b_title(csv_wrapper):
-    def detect_oddities(value):
-        # check for capitalisation - surprisingly tricky
-        capitalised = value.split(" ")[0].istitle()
-        if not capitalised:
-            return True
-        # check for surprisingly short strings
-        if len(value) < 5:
-            return True
-        return False
-    
     ids = csv_wrapper.find_by_value_function("dc.title[en]", detect_oddities)
     csv_wrapper.add_column("note.dc.title[en]")
     csv_wrapper.set_value("note.dc.title[en]", ids, "possible issue")
@@ -461,12 +447,6 @@ def rule14c_general(csv_wrapper):
 
 # 14.d. detect and delete all e-mail addresses (have a way to check it's a safe delete first)
 def rule14d_general(csv_wrapper):
-    def strip_email(value):
-        import re
-        x = "[a-Z0-9._%+-]+@[a-Z0-9.-]+\.[a-Z]{2,4}"
-        if re.match(x, value) is not None:
-            return None
-        return value
     csv_wrapper.apply_global_value_function(strip_email)
 
 # 14.e. detect subject keywords which are suspiciously long
