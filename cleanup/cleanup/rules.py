@@ -424,14 +424,14 @@ def rule13b_publisher(csv_wrapper):
 ###########################################################
 
 # 14.a. delete the contents of all fields where the only value in the field is 
-# “||”, the multiple value separator
+# "||", the multiple value separator
 # 14.b. for all fields with multiple values, de-duplicate repeated values
 # this rule should cover both of these ...
 def rule14a_general(csv_wrapper):
     csv_wrapper.deduplicate_values()
 
-# 14.c. auto-detect and flag instances of “university”, “institution”, 
-# “school”, "college" etc, and report on the rows where these occur, for possible 
+# 14.c. auto-detect and flag instances of "university", "institution", 
+# "school", "college" etc, and report on the rows where these occur, for possible 
 # manual intervention
 def rule14c_general(csv_wrapper):
     # dc.contributor.author[en]
@@ -459,7 +459,7 @@ def rule14c_general(csv_wrapper):
     csv_wrapper.add_column("note.organisations")
     csv_wrapper.set_value("note.organisations", ids, "possible org name")
 
-# 14.d. detect and delete all e-mail addresses (have a way to check it’s a safe delete first)
+# 14.d. detect and delete all e-mail addresses (have a way to check it's a safe delete first)
 def rule14d_general(csv_wrapper):
     def strip_email(value):
         import re
@@ -481,7 +481,7 @@ def rule14e_general(csv_wrapper):
     csv_wrapper.add_column("note.dc.subject")
     csv_wrapper.set_value("note.dc.subject", ids, "long subject")
 
-# 14.f. auto-detect items which would have the defunct “Mathematical and Computer Science” JACS code
+# 14.f. auto-detect items which would have the defunct "Mathematical and Computer Science" JACS code
 # FIXME: do we still need this?
 def rule14f_general(csv_wrapper):
     pass

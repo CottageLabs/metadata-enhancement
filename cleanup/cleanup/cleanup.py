@@ -69,10 +69,15 @@ print "done"
 print
 
 # run through all the rules, passing in the wrapper each time
+count_run = 0
 for rule in runrules:
     print "Executing rule " + rule.__name__ + " ..."
     rule(csv_wrapper)
+    count_run += 1
     print "complete"
+print
+
+print 'Ran', count_run, 'rules'
 print
 
 # once we're finished, write out the results
