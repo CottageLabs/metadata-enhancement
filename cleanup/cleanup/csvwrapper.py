@@ -123,7 +123,7 @@ class CSVWrapper(object):
         apply the supplied function to every value in every cell in the whole document
         """
         for column in self.csv_dict.keys():
-            self.apply_value_function(self, column, fn)
+            self.apply_value_function(column, fn)
     
     def apply_cell_function(self, column, fn):
         """
@@ -168,6 +168,8 @@ class CSVWrapper(object):
         if self.csv_dict.has_key(column):
             return
         self.csv_dict[column] = {}
+        for id in self.ids:
+            self.csv_dict[column][id] = ['']
         
     def delete_record(self, item_id):
         """
@@ -183,7 +185,7 @@ class CSVWrapper(object):
         if key_existed:
             self.ids.remove(item_id)
         
-    def find_in_column(self, column, search_for, partial = False):
+    def find_in_column(self, column, search_for, partial=False):
         """
         Find all records which contain the specified value in the specified column 
         and return a list of the matching Jorum item ID-s. Pass partial = True to 
@@ -194,13 +196,20 @@ class CSVWrapper(object):
         found = []
         for id in self.ids:
             values = self.csv_dict[column][id]
+            counted = False
             for value in values:
                 if partial:
                     if search_for in value:
                         found.append(id)
+                        counted = True
                 else:
                     if search_for == value:
                         found.append(id)
+                        counted = True
+                if counted:
+                    # no need to look any further if we've already caught
+                    # this item id
+                    break
         return found
         
     def merge_columns(self, src, dst):
@@ -231,14 +240,15 @@ class CSVWrapper(object):
         src_norm = []
         map = {}
         for v in src_values:
-            src_norm.append(v.lower())
-            map[v.lower()] = v
+            if v is not None and v != "":
+                src_norm.append(v.lower())
+                map[v.lower()] = v
         
         dst_norm = []
-        map = {}
         for v in dst_values:
-            dst_norm.append(v.lower())
-            map[v.lower()] = v
+            if v is not None and v != "":
+                dst_norm.append(v.lower())
+                map[v.lower()] = v
         
         norm_result = dst_norm + [a for a in src_norm if a not in dst_norm]
         result = [map.get(r) for r in norm_result]
@@ -254,7 +264,7 @@ class CSVWrapper(object):
             return
         existing_values = self.csv_dict[column][item_id]
         new_values = self._combine(values, existing_values)
-        self.csv_dict[column][id] = new_values
+        self.csv_dict[column][item_id] = new_values
         
     def delete_contents(self, column, item_id):
         """
