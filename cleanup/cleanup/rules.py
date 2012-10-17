@@ -34,7 +34,8 @@ def may_be_org(data):
     True if the given string looks like an organisation name (certain keywords). 
     False otherwise.
     """
-    org_keywords = ['university', 'institution', 'school']
+    value = data.lower()
+    org_keywords = ['university', 'institution', 'school', 'college']
     for word in org_keywords:
         if word in value:
             return True
@@ -258,14 +259,22 @@ def rule5e_subject(csv_wrapper):
 # NOTE: implementing this for all values in all fields in Subject, not just single-valued ones
 def rule5f_subject(csv_wrapper):
     
-    def fix_multival(data):
+    def fix_multival(values):
+        new_values = []
         splitchars = [',', ';']
-        for char in splitchars:
-            result = '||'.join(clean_list(data.split(char)))
-        
-        return result
+        for value in values:
+            results = []
+            tripped = False
+            for char in splitchars:
+                results = value.split(char)
+                if len(results) > 1:
+                    new_values += [x.strip() for x in results]
+                    tripped = True
+            if not tripped:
+                new_values.append(value)
+        return new_values
     
-    csv_wrapper.apply_value_function("dc.subject[en]", fix_multival)
+    csv_wrapper.apply_cell_function("dc.subject[en]", fix_multival)
 
 # 6. Coverage column group
 ###########################################################
