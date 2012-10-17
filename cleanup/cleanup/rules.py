@@ -28,6 +28,26 @@ def detect_oddities(value):
     if len(value) < 5:
         return True
     return False
+    
+def may_be_org(data):
+    """
+    True if the given string looks like an organisation name (certain keywords). 
+    False otherwise.
+    """
+    org_keywords = ['university', 'institution', 'school']
+    for word in org_keywords:
+        if word in value:
+            return True
+    
+    return False
+        
+def is_known_org(data):
+    known_organisations = ['x4l healthier nation', 'leeds metropolitan university', 'cilip', 'the learning bank', 'university of york', 'institution of enterprise', 'open educational repository in support of computer science', 'uclan', 'uclanoer']
+    
+    if data.lower() in known_organisations:
+        return True
+    else:
+        return False
         
 # 1. Advisor columns
 ###########################################################
@@ -121,6 +141,28 @@ def rule2g_author(csv_wrapper):
             return data
         
     csv_wrapper.apply_value_function('dc.contributor.author[en]', replace_vcard)
+    
+# 2.h. Copy all organisation names to dc.publisher[en] where possible.
+def rule2h_author(csv_wrapper):
+    src = 'dc.contributor.author[en]'
+    dst = 'dc.publisher[en]'
+    
+    # 2.h.i. pattern match on "university", "institution", "school"
+    csv_wrapper.c2c_copy_by_value_function(src, dst, may_be_org)
+    
+    # 2.h.ii. check for known, commonly appearing organisations
+    csv_wrapper.c2c_copy_by_value_function(src, dst, is_known_org)
+    
+    
+# 2.i. if value == 'uclanoer' || value == 'uclan' -> delete value
+def rule2i_author(csv_wrapper):
+    def delete_uclan_uclanoer_authors(data):
+        if data == 'uclan' or data == 'uclanoer':
+            return None
+        else:
+            return data
+    
+    csv_wrapper.apply_value_function('dc.contributor.author[en]', delete_uclan_uclanoer_authors)
     
 # 3. Creator column group
 ###########################################################

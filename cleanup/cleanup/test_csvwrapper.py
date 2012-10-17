@@ -4,9 +4,9 @@ from copy import deepcopy
 
 data = {
     "dc.description" : {1: ["desc1"], 2: ["desc2"], 3: ["desc3", "desc4"], 4: ['']},
-    "dc.title" : {1: ["title1"], 2: ["desc1"], 3: ["title3", "title4"], 4 : ["findme", "title5"]},
+    "dc.title" : {1: ["title1"], 2: ["desc1"], 3: ["title3", "title4"], 4 : ["findme", "title5", "copymetoo"]},
     "dc.identifier" : {1: ["id1"], 2: ["id2"], 3: ["id3", "desc1"], 4 : ['']},
-    "dc.source" : {1: ["findme"], 2: [""], 3 : [""], 4 : [""]},
+    "dc.source" : {1: ["findme"], 2: [""], 3 : [""], 4 : ["copymetoo"]},
     "dc.description[en]" : {1: ["desc1"], 2: ["other"], 3: ["desc3", "desc5"], 4: ["desc6"]}
 }
 
@@ -166,3 +166,21 @@ class TestCsvWrapper(unittest.TestCase):
         
         assert len(w.csv_dict["dc.description"][4]) == 1
         assert "newvalue" in w.csv_dict["dc.description"][4]
+    
+    def test_13_c2c_copy_by_value_function(self):
+        w = deepcopy(wrapper)
+        
+        def vf(value):
+            if value == 'findme' or value == 'copymetoo':
+                return True
+            return False
+        
+        orig_title_4_len = len(w.csv_dict['dc.title'][4])
+        
+        w.c2c_copy_by_value_function('dc.source', 'dc.title', vf)
+        
+        # should NOT have duplicated the copymetoo entry
+        assert len(w.csv_dict['dc.title'][4]) == orig_title_4_len
+        # the last element in the first item in dc.title should have been 
+        # copied over from dc.source - findme
+        assert w.csv_dict['dc.title'][1][-1:][0] == 'findme'

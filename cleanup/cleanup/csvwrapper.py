@@ -157,6 +157,21 @@ class CSVWrapper(object):
                     found.append(id)
         return found
     
+    def c2c_copy_by_value_function(self, src, dst, fn):
+        """
+        column-to-column copying of values if applied function returns True
+        
+        Apply the function that's being passed in to each value in each cell of the source column. Copy each value for which the function returns true to the destination column.
+        """
+        if not self.csv_dict.has_key(src) or not self.csv_dict.has_key(dst):
+            return
+            
+        for id in self.ids:
+            values = self.csv_dict[src][id]
+            for value in values:
+                if fn(value):
+                    self.add_value(dst, id, value)
+    
     def delete_column(self, column):
         """
         Delete a column from the dataset with all its data.
