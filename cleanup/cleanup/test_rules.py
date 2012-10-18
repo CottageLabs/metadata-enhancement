@@ -7,13 +7,12 @@ data = {
     'dc.contributor.advisor[]': {1 : ["advisor1"], 2: ["advisor2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.advisor[en]': {1 : [""], 2 : ["advisor3"], 3: ['conadv'], 4: ['DiPEX'], 
                                     5: ['iCase bioukoer'], 6: ['Rong Yang'], 7: ['UCLAN']},
-    "dc.subject[en]" : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     "dc.contributor.author[en]" : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     
     'dc.contributor.author[]' : {1 : ["author1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author' : {1 : [""], 2: [""], 3: ['author3'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[x-none]' : {1 : [""], 2: ["author2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    'dc.contributor.author[en]' : {1 : [""], 2: [""], 3: [''], 4: ['contributor'], 5: ['Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard'], 6: [''], 7: ['']},
+    'dc.contributor.author[en]' : {1 : ["University of Here"], 2: ["College of Hard Knocks"], 3: [''], 4: ['contributor'], 5: ['Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard'], 6: ['uclanoer'], 7: ['uclan']},
     'dc.contributor.author[English]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[en-gb]' : {1 : ["publisher1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.publisher[en]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
@@ -23,7 +22,18 @@ data = {
     
     'dc.contributor' : {1 : ["test@test.com", "bob@example.com"], 2: ["University of Somewhere"], 3: ['alice@example.com'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor[x-none]' : {1 : ["University of Over There"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-
+    'dc.contributor.other[en]' : {1 : ["other1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    
+    "dc.subject[en]" : {1 : [" de-normalised  spacing    here "], 2: ['"quoted"', 'unquoted'], 3: ['Upper Case'], 4: ['split; this'], 5: ['and, this', 'but not this'], 6: [''], 7: ['']},
+    "dc.subject[EN]" : {1 : ["subject1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    "dc.subject[]" : {1 : [""], 2: ["subject2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    "dc.subject[en-gb]" : {1 : ["subject3"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    "dc.subject[ene]" : {1 : [""], 2: ["subject4"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    
+    'dc.subject.classification[]': {1 : ["class1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.subject.classification[en]': {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    
+    'dc.description.sponsorship': {1 : ["sponsor1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
 }
 
 wrapper = csvwrapper.CSVWrapper()
@@ -129,6 +139,25 @@ class TestRules(unittest.TestCase):
         
         assert w.csv_dict['dc.contributor.author[en]'][5][0] == "Mark Foss"
     
+    def test_2h_author(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule2h_author(w)
+        
+        assert w.csv_dict['dc.publisher[en]'][1][0] == "University of Here"
+        assert w.csv_dict['dc.contributor.author[en]'][1][0] == "University of Here"
+        
+        assert w.csv_dict['dc.publisher[en]'][2][0] == "College of Hard Knocks"
+        assert w.csv_dict['dc.contributor.author[en]'][2][0] == "College of Hard Knocks"
+    
+    def test_2i_author(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule2i_author(w)
+        
+        assert w.csv_dict['dc.contributor.author[en]'][6][0] == ""
+        assert w.csv_dict['dc.contributor.author[en]'][7][0] == ""
+    
     def test_3a_creator(self):
         w = deepcopy(wrapper)
         
@@ -170,3 +199,65 @@ class TestRules(unittest.TestCase):
         
         assert "University of Over There" in w.csv_dict['dc.publisher[en]'][1]
         assert not w.csv_dict.has_key('dc.contributor[x-none]')
+
+    def test_5a_subject(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule5a_subject(w)
+        
+        assert "subject1" in w.csv_dict['dc.subject[en]'][1]
+        assert not w.csv_dict.has_key('dc.subject[EN]')
+        
+        assert "subject2" in w.csv_dict['dc.subject[en]'][2]
+        assert not w.csv_dict.has_key('dc.subject[]')
+        
+        assert "subject3" in w.csv_dict['dc.subject[en]'][1]
+        assert not w.csv_dict.has_key('dc.subject[en-gb]')
+        
+        assert "subject4" in w.csv_dict['dc.subject[en]'][2]
+        assert not w.csv_dict.has_key('dc.subject[ene]')
+        
+    def test_5b_subject(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule5b_subject(w)
+        
+        assert "other1" in w.csv_dict['dc.subject[en]'][1]
+        assert not w.csv_dict.has_key('dc.contributor.other[en]')
+        
+    def test_5c_subject(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule5c_subject(w)
+        
+        assert "class1" in w.csv_dict['dc.subject.classification[en]'][1]
+        assert not w.csv_dict.has_key('dc.subject.classification[]')
+        
+    def test_5d_subject(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule5d_subject(w)
+        
+        assert "sponsor1" in w.csv_dict['dc.subject[en]'][1]
+        assert not w.csv_dict.has_key('dc.description.sponsorship')
+        
+    def test_5e_subject(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule5e_subject(w)
+        
+        assert "de-normalised spacing here" in w.csv_dict['dc.subject[en]'][1]
+        assert "quoted" in w.csv_dict['dc.subject[en]'][2]
+        assert "upper case" in w.csv_dict['dc.subject[en]'][3]
+    
+    def test_5f_subject(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule5f_subject(w)
+        
+        assert "split" in w.csv_dict['dc.subject[en]'][4]
+        assert "this" in w.csv_dict['dc.subject[en]'][4], w.csv_dict['dc.subject[en]']
+        assert "split; this" not in w.csv_dict['dc.subject[en]'][4]
+        assert "and" in w.csv_dict['dc.subject[en]'][5]
+        assert "this" in w.csv_dict['dc.subject[en]'][5]
+        assert "and, this" not in w.csv_dict['dc.subject[en]'][5]
