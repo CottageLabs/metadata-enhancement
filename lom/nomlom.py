@@ -10,6 +10,7 @@ not_found_counts = {}
 
 found = {}
 found['general.coverage'], not_found_counts['general.coverage'] = lommer.search('/top:manifest/top:metadata/imsd:lom/imsd:general/imsd:coverage/imsd:langstring')
+found['lifecycle.version'], not_found_counts['lifecycle.version'] = lommer.search('/top:manifest/top:metadata/imsd:lom/imsd:lifecycle/imsd:version')
 
 for id, elems in found['general.coverage'].iteritems():
     # normalise spacing incl. newlines
