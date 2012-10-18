@@ -339,7 +339,7 @@ def rule7e_date(csv_wrapper):
         for i in range(1, len(dts)):
             if oldest > dts[i]:
                 oldest = dts[i]
-        return [oldest]
+        return [datetime.strftime(oldest, "%Y-%m-%dT%H:%M:%SZ")]
         
     # possible date fields:
     # dc.date
@@ -364,7 +364,7 @@ def rule7f_date(csv_wrapper):
 
 # 8.a. delete dc.description.uri
 def rule8a_description(csv_wrapper):
-    csv_wrapper.delete_column("dc.description.uri")
+    csv_wrapper.delete_column("dc.description.uri[en]")
 
 # 8.b. migrate dc.description[] and dc.description[en-gb] to dc.description[en]
 def rule8b_description(csv_wrapper):

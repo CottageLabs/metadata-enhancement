@@ -34,6 +34,20 @@ data = {
     'dc.subject.classification[en]': {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     
     'dc.description.sponsorship': {1 : ["sponsor1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.description.uri[en]': {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.description[]': {1 : ["desc1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.description[en]': {1 : [""], 2: [""], 3: ['no capital letter'], 4: ['shrt'], 5: [''], 6: [''], 7: ['']},
+    'dc.description[en-gb]': {1 : [""], 2: ["desc2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    
+    'dc.coverage.temporal[en]': {1 : ["sponsor1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.coverage.spatial[en]': {1 : ["sponsor1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    
+    'dc.date[]': {1 : ["Tue, 16 Jun 2009 11:34:02 +0100"], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.date': {1 : [""], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.date.issued[]': {1 : ["date1"], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.date.issued': {1 : [""], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.date.created': {1 : [""], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.date.created[en]': {1 : [""], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
 }
 
 wrapper = csvwrapper.CSVWrapper()
@@ -261,3 +275,104 @@ class TestRules(unittest.TestCase):
         assert "and" in w.csv_dict['dc.subject[en]'][5]
         assert "this" in w.csv_dict['dc.subject[en]'][5]
         assert "and, this" not in w.csv_dict['dc.subject[en]'][5]
+    
+    def test_6a_coverage(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule6a_coverage(w)
+        
+        assert not w.csv_dict.has_key('dc.coverage.temporal[en]')
+        
+    def test_6b_coverage(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule6b_coverage(w)
+        
+        assert not w.csv_dict.has_key('dc.coverage.spatial[en]')
+    
+    def test_7a_date(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule7a_date(w)
+        
+        # Tue, 16 Jun 2009 11:34:02 +0100
+        assert w.csv_dict['dc.date[]'][1][0] == "2009-06-16T11:34:02Z", w.csv_dict['dc.date[]'][1][0]
+    
+    def test_7b_date(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule7b_date(w)
+        
+        assert w.csv_dict['dc.date'][1][0] == "Tue, 16 Jun 2009 11:34:02 +0100"
+        assert not w.csv_dict.has_key('dc.date[]')
+    
+    def test_7c_date(self):
+        # no rule implementation after all
+        pass
+    
+    def test_7d_date(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule7d_date(w)
+        
+        assert w.csv_dict['dc.date.issued'][1][0] == "date1"
+        assert not w.csv_dict.has_key('dc.date.issued[]')
+    
+    def test_7e_date(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule7e_date(w)
+        
+        # 2011-01-01T00:00:00Z
+        assert len(w.csv_dict['dc.date'][2]) == 1
+        assert w.csv_dict['dc.date'][2][0] == "2011-01-01T00:00:00Z", w.csv_dict['dc.date']
+        
+        assert len(w.csv_dict['dc.date[]'][2]) == 1
+        assert w.csv_dict['dc.date[]'][2][0] == "2011-01-01T00:00:00Z"
+        
+        assert len(w.csv_dict['dc.date.created'][2]) == 1
+        assert w.csv_dict['dc.date.created'][2][0] == "2011-01-01T00:00:00Z"
+        
+        assert len(w.csv_dict['dc.date.created[en]'][2]) == 1
+        assert w.csv_dict['dc.date.created[en]'][2][0] == "2011-01-01T00:00:00Z"
+        
+        assert len(w.csv_dict['dc.date.issued'][2]) == 1
+        assert w.csv_dict['dc.date.issued'][2][0] == "2011-01-01T00:00:00Z"
+        
+        assert len(w.csv_dict['dc.date.issued[]'][2]) == 1
+        assert w.csv_dict['dc.date.issued[]'][2][0] == "2011-01-01T00:00:00Z"
+    
+    def test_7f_date(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule7f_date(w)
+        
+        assert not w.csv_dict.has_key('dc.date.created[en]')
+    
+    def test_8a_description(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule8a_description(w)
+        
+        assert not w.csv_dict.has_key('dc.description.uri[en]')
+    
+    def test_8b_description(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule8b_description(w)
+        
+        assert w.csv_dict['dc.description[en]'][1][0] == "desc1"
+        assert not w.csv_dict.has_key('dc.description[]')
+        
+        assert w.csv_dict['dc.description[en]'][2][0] == "desc2"
+        assert not w.csv_dict.has_key('dc.description[en-gb]')
+    
+    def test_8c_description(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule8c_description(w)
+        
+        assert w.csv_dict['note.dc.description[en]'][3][0] == "possible issue"
+        assert w.csv_dict['note.dc.description[en]'][4][0] == "possible issue"
+    
+    

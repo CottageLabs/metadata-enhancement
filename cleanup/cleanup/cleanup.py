@@ -72,6 +72,10 @@ runrules = [
     rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor, # contributor column group
     rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, # subject column group
     rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject, #
+    rules.rule6a_coverage, rules.rule6b_coverage, # coverage columns
+    rules.rule7a_date, rules.rule7b_date, rules.rule7c_date,    # date column group
+    rules.rule7d_date, rules.rule7e_date, rules.rule7f_date,    #
+    rules.rule8a_description, rules.rule8b_description, rules.rule8c_description # description column group
     ]
 
 # load the csv
