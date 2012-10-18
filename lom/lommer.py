@@ -33,9 +33,12 @@ namespaces = {
 lomfnames = glob.glob(loms_dir + '*.xml')
 loms = {}
 
+print 'Loading LOM-s ...'
 for fname in lomfnames:
     id = int(fname[fname.rfind('/') + 1 : fname.rfind('.')])
     loms[id] = etree.parse(fname)
+print '[Done] Loaded', len(loms), 'LOM-s. Enjoy.'
+print
 
 def search(q):
     found = {}
