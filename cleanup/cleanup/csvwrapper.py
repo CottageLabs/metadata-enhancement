@@ -310,10 +310,12 @@ class CSVWrapper(object):
         if not self.csv_dict.has_key(column_name):
             self.csv_dict[column_name] = {}
         for id in self.ids:
-            v = ['']
+            v = []
             if id in column.keys():
                 v = column[id]
-            self.csv_dict[column_name][id] = v
+            existing = self.csv_dict[column_name][id]
+            new = self._combine(v, existing)
+            self.csv_dict[column_name][id] = new
 
     # Deprecated method templates below - if found to be required, move above 
     # this line and uncomment.
