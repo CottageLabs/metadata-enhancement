@@ -305,6 +305,15 @@ class CSVWrapper(object):
             if not self.csv_dict[column].has_key(id):
                 continue
             self.csv_dict[column][id] = [value]
+            
+    def incorporate_column(self, column_name, column):
+        if not self.csv_dict.has_key(column_name):
+            self.csv_dict[column_name] = {}
+        for id in self.ids:
+            v = ['']
+            if id in column.keys():
+                v = column[id]
+            self.csv_dict[column_name][id] = v
 
     # Deprecated method templates below - if found to be required, move above 
     # this line and uncomment.

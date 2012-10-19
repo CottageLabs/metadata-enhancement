@@ -11,6 +11,7 @@ xpaths = {
     'general.coverage' : '/top:manifest/top:metadata/imsd:lom/imsd:general/imsd:coverage/imsd:langstring',
     'lifecycle.version' : '/top:manifest/top:metadata/imsd:lom/imsd:lifecycle/imsd:version/imsd:langstring',
     'lifecycle.contribute' : '/top:manifest/top:metadata/imsd:lom/imsd:lifecycle/imsd:contribute/imsd:centity/imsd:vcard',
+    'lifecycle.contribute.role' : '/top:manifest/top:metadata/imsd:lom/imsd:lifecycle/imsd:contribute/imsd:role/imsd:value/imsd:langstring',
     'educational.learningResourceType' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:learningresourcetype/imsd:value/imsd:langstring',
     'educational.intendedEndUserRole' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:intendedenduserrole/imsd:value/imsd:langstring',
     'educational.context' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:context/imsd:value/imsd:langstring',
