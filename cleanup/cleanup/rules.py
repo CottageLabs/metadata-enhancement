@@ -409,10 +409,8 @@ def rule10b_language(csv_wrapper):
 
 # 10.c. validate and convert all language codes to <two-letter>[-<two letter>] form
 
-# FIXME: Looking at the data, all the codes are two letters,
-# except for a bunch of en-gb or en-GB codes.  We can therefore easily normalise,
-# and use something like babel to validate the codes to make sure there are no 
-# oddities.
+# Decision taken to NOT touch the language codes since future data could come 
+# in any format. Instead, the indexing will take care of the varied codes.
 
 # 11. Title columns
 #############################################################
@@ -420,6 +418,9 @@ def rule10b_language(csv_wrapper):
 # 11.a. merge dc.title[*] to dc.title[en]
 def rule11a_title(csv_wrapper):
     csv_wrapper.merge_columns("dc.title[*]", "dc.title[en]")
+    csv_wrapper.merge_columns("dc.title[]", "dc.title[en]")
+    csv_wrapper.merge_columns("dc.title[en-US]", "dc.title[en]")
+    csv_wrapper.merge_columns("dc.title[en-gb]", "dc.title[en]")
 
 # 11.b. Validate content (check for short strings, starting with capital letters, etc)
 def rule11b_title(csv_wrapper):
