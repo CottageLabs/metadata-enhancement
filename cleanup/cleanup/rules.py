@@ -521,3 +521,30 @@ def rule14e_general(csv_wrapper):
 # FIXME: do we still need this?
 def rule14f_general(csv_wrapper):
     pass
+
+# 15. LOM columns:
+##############################################################
+
+# 15.a. extract any orgs from lom.vcard and place into dc.publisher
+# 15.b. delete lom.vcard
+def rule15a_lom(self):
+    def extract_org(value):
+        """ BEGIN:vcard FN:J. Koenig ORG:University of Cambridge END:vcard """
+        start = value.find("ORG:")
+        if start < 0:
+            return None
+        
+        afterorg = value[start + 4:]
+        end = afterorg.find(":")
+        
+        if end < 0:
+            return None
+        
+        org = afterorg[:end - 3].strip()
+        
+        return org
+        
+    csv_wrapper.apply_value_function('lom.vcard', extract_org)
+    csv_wrapper.merge_columns('lom.vcard', 'dc.publisher')
+
+
