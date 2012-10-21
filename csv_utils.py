@@ -2,13 +2,13 @@ import csv
 import copy
 
 class CSVUtils(object):
-    multival_sep = None # The string which is used to separate multiple values within one field
+    # multival_sep = None # The string which is used to separate multiple values within one field
     column_pos = {}
     columns = []
     data = []
 
     def __init__(self, csv_filename, multival_sep = None):
-        self.multival_sep = multival_sep.strip() # trim whitespace off both ends of the separator string
+        # self.multival_sep = multival_sep.strip() # trim whitespace off both ends of the separator string
         self.load(csv_filename)
         
     def load(self, csv_filename):
@@ -22,11 +22,6 @@ class CSVUtils(object):
                 col_num += 1
                 
             for row in content:
-                for field in row:
-                    if multival_sep:
-                        field = multival_str2list(field, multival_sep)
-                        # if len(field) <= 1:
-                            # field = ''.join(field)
                 self.data.append(row)
                 
     def save(self, output_filename):
@@ -94,10 +89,10 @@ class CSVUtils(object):
             if row[merge_this]:
                 row[into_that] = row[merge_this]
             
-            del row[merge_this]
+            # del row[merge_this]
             row_count += 1
         
-        del self.columns[merge_this]
+        # del self.columns[merge_this]
         
     def debug(self):
         print '##### Columns #####'

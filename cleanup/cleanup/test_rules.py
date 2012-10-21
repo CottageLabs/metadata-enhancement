@@ -48,7 +48,26 @@ data = {
     'dc.date.issued': {1 : [""], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.date.created': {1 : [""], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.date.created[en]': {1 : [""], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-}
+    
+    'dc.language[x-none]': {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.language': {1 : ['en'], 2: [""], 3: [''], 4: [''], 5: ['bg', 'gr'], 6: [''], 7: ['']},
+    'dc.language[]': {1 : ["en"], 2: ["fr"], 3: ['de'], 4: ['es', 'es', 'en'], 5: ['bg', 'gr'], 6: [''], 7: ['']},
+    'dc.language[de]': {1 : ["en"], 2: ["fr"], 3: ['de'], 4: ['es', 'es', 'es', 'en'], 5: ['bg', 'gr'], 6: [''], 7: ['']},
+    'dc.language[en-GB]': {1 : ["en"], 2: [""], 3: [''], 4: ['ru'], 5: ['gr'], 6: ['zh'], 7: ['']},
+    'dc.language[en-gb]': {1 : [""], 2: [""], 3: [''], 4: [''], 5: ['en'], 6: [''], 7: ['']},
+    'dc.language[en]': {1 : ["en"], 2: ["en"], 3: ['en'], 4: ['en'], 5: ['en'], 6: ['en'], 7: ['']},
+    'dc.language[fr]': {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+
+    'dc.title[en]': {1 : ["Un"], 2: [""], 3: [''], 4: [''], 5: [''], 6: ['Chwech'], 7: ['saith']},
+    'dc.title[*]': {1 : [""], 2: ["Dau"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.title[]': {1 : [""], 2: [""], 3: ['tri'], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.title[en-US]': {1 : [""], 2: [""], 3: [''], 4: ['Pedwar'], 5: [''], 6: [''], 7: ['']},
+    'dc.title[en-gb]': {1 : [""], 2: [""], 3: [''], 4: [''], 5: ['Pimp'], 6: [''], 7: ['']},
+
+    'dc.identifier.uri': {1 : ["10.1000/182"], 2: [""], 3: ['== fun!'], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.identifier.uri[]': {1 : ["UUID"], 2: ["without context"], 3: ['== fun!'], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.identifier.uri[en]': {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['this resource is scottish']},
+    }
 
 wrapper = csvwrapper.CSVWrapper()
 wrapper.csv_dict = data
@@ -375,4 +394,108 @@ class TestRules(unittest.TestCase):
         assert w.csv_dict['note.dc.description[en]'][3][0] == "possible issue"
         assert w.csv_dict['note.dc.description[en]'][4][0] == "possible issue"
     
-    
+    def test_10a_language(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule10a_language(w)
+        
+        assert not w.csv_dict.has_key('dc.language[x-none]')
+        
+    def test_10b_language(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule10b_language(w)
+        
+        assert not w.csv_dict.has_key('dc.language[]')
+        assert not w.csv_dict.has_key('dc.language[de]')
+        assert not w.csv_dict.has_key('dc.language[en-GB]')
+        assert not w.csv_dict.has_key('dc.language[en-gb]')
+        assert not w.csv_dict.has_key('dc.language[en]')
+        assert not w.csv_dict.has_key('dc.language[fr]')
+        assert w.csv_dict.has_key('dc.language')
+        
+        assert len(w.csv_dict['dc.language'][1]) == 1
+        assert w.csv_dict['dc.language'][1][0] == 'en'
+        
+        assert len(w.csv_dict['dc.language'][2]) == 2
+        assert w.csv_dict['dc.language'][2][0] == 'fr'
+        assert w.csv_dict['dc.language'][2][1] == 'en'
+        
+        assert len(w.csv_dict['dc.language'][3]) == 2
+        assert w.csv_dict['dc.language'][3][0] == 'de'
+        assert w.csv_dict['dc.language'][3][1] == 'en'
+        
+        assert len(w.csv_dict['dc.language'][4]) == 4
+        assert w.csv_dict['dc.language'][4][0] == 'es'
+        assert w.csv_dict['dc.language'][4][1] == 'es'
+        assert w.csv_dict['dc.language'][4][2] == 'en'
+        assert w.csv_dict['dc.language'][4][3] == 'ru'
+        
+        assert len(w.csv_dict['dc.language'][5]) == 3
+        assert w.csv_dict['dc.language'][5][0] == 'bg'
+        assert w.csv_dict['dc.language'][5][1] == 'gr'
+        assert w.csv_dict['dc.language'][5][2] == 'en'
+        
+        assert len(w.csv_dict['dc.language'][6]) == 2
+        assert w.csv_dict['dc.language'][6][0] == 'zh'
+        assert w.csv_dict['dc.language'][6][1] == 'en'
+        
+        assert len(w.csv_dict['dc.language'][7]) == 0
+        
+    def test_11a_title(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule11a_title(w)
+        
+        assert not w.csv_dict.has_key('dc.title[*]')
+        assert not w.csv_dict.has_key('dc.title[]')
+        assert not w.csv_dict.has_key('dc.title[en-US]')
+        assert not w.csv_dict.has_key('dc.title[en-gb]')
+        assert w.csv_dict.has_key('dc.title[en]')
+        
+        assert w.csv_dict['dc.title[en]'][1][0] == 'Un'
+        assert w.csv_dict['dc.title[en]'][2][0] == 'Dau'
+        assert w.csv_dict['dc.title[en]'][3][0] == 'tri'
+        assert w.csv_dict['dc.title[en]'][4][0] == 'Pedwar'
+        assert w.csv_dict['dc.title[en]'][5][0] == 'Pimp'
+        assert w.csv_dict['dc.title[en]'][6][0] == 'Chwech'
+        assert w.csv_dict['dc.title[en]'][7][0] == 'saith'
+        
+    def test_11b_title(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule11b_title(w)
+        
+        assert w.csv_dict.has_key('note.dc.title[en]')
+        
+        assert w.csv_dict['note.dc.title[en]'][1][0] == 'possible issue'
+        assert w.csv_dict['note.dc.title[en]'][2][0] == 'possible issue'
+        assert w.csv_dict['note.dc.title[en]'][3][0] == 'possible issue'
+        assert w.csv_dict['note.dc.title[en]'][4][0] == 'possible issue'
+        assert w.csv_dict['note.dc.title[en]'][5][0] == 'possible issue'
+        assert w.csv_dict['note.dc.title[en]'][6][0] == ''
+        assert w.csv_dict['note.dc.title[en]'][7][0] == 'possible issue'
+        
+    def test_12a_identifier(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule12a_identifier(w)
+        
+        assert not w.csv_dict.has_key('dc.identifier.uri[]')
+        assert not w.csv_dict.has_key('dc.identifier.uri[en]')
+        assert w.csv_dict.has_key('dc.identifier.uri')
+        
+        assert len(w.csv_dict['dc.identifier.uri'][1]) == 2
+        assert w.csv_dict['dc.identifier.uri'][1][0] == '10.1000/182'
+        assert w.csv_dict['dc.identifier.uri'][1][1] == 'UUID'
+        
+        assert w.csv_dict['dc.identifier.uri'][2][0] == 'without context'
+        
+        assert len(w.csv_dict['dc.identifier.uri'][3]) == 1
+        assert w.csv_dict['dc.identifier.uri'][3][0] == '== fun!'
+        
+        assert len(w.csv_dict['dc.identifier.uri'][4]) + \
+            len(w.csv_dict['dc.identifier.uri'][5]) + \
+            len(w.csv_dict['dc.identifier.uri'][6]) == 0
+        
+        assert w.csv_dict['dc.identifier.uri'][7][0] == 'this resource is scottish'
