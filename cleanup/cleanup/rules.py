@@ -519,5 +519,6 @@ def rule14e_general(csv_wrapper):
 
 # 14.f. auto-detect items which would have the defunct "Mathematical and Computer Science" JACS code
 # FIXME: do we still need this?
+# ET: No. We're moving everything to I100. TODO correct the spec, leave a comment or del. this point.
 def rule14f_general(csv_wrapper):
     pass
