@@ -8,18 +8,20 @@ namespaces = {
 }
 
 xpaths = {
-    'general.coverage' : '/top:manifest/top:metadata/imsd:lom/imsd:general/imsd:coverage/imsd:langstring',
-    'lifecycle.version' : '/top:manifest/top:metadata/imsd:lom/imsd:lifecycle/imsd:version/imsd:langstring',
-    'lifecycle.contribute' : '/top:manifest/top:metadata/imsd:lom/imsd:lifecycle/imsd:contribute/imsd:centity/imsd:vcard',
-    'lifecycle.contribute.role' : '/top:manifest/top:metadata/imsd:lom/imsd:lifecycle/imsd:contribute/imsd:role/imsd:value/imsd:langstring',
-    'educational.learningResourceType' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:learningresourcetype/imsd:value/imsd:langstring',
-    'educational.intendedEndUserRole' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:intendedenduserrole/imsd:value/imsd:langstring',
-    'educational.context' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:context/imsd:value/imsd:langstring',
-    'educational.typicalLearningTime' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:typicallearningtime/imsd:datetime',
-    'educational.description' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:description/imsd:langstring',
-    'educational.language' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:language',
-    'relation' : '/top:manifest/top:metadata/imsd:lom/imsd:relation/imsd:resource/imsd:description/imsd:langstring',
-    'classification' : '/top:manifest/top:metadata/imsd:lom/imsd:classification/imsd:taxonpath/imsd:taxon/imsd:entry/imsd:langstring',
+#    'general.coverage' : '/top:manifest/top:metadata/imsd:lom/imsd:general/imsd:coverage/imsd:langstring',
+#    'lifecycle.version' : '/top:manifest/top:metadata/imsd:lom/imsd:lifecycle/imsd:version/imsd:langstring',
+    'lom.vcard' : '/top:manifest/top:metadata/imsd:lom/imsd:lifecycle/imsd:contribute/imsd:centity/imsd:vcard',
+    'date.created' : '/top:manifest/top:metadata/imsd:lom/imsd:lifecycle/imsd:contribute/imsd:date/imsd:datetime',
+#    'lifecycle.contribute.role' : '/top:manifest/top:metadata/imsd:lom/imsd:lifecycle/imsd:contribute/imsd:role/imsd:value/imsd:langstring',
+    'lom.educational.learningresourcetype' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:learningresourcetype/imsd:value/imsd:langstring',
+    'lom.educational.intendedenduserrole' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:intendedenduserrole/imsd:value/imsd:langstring',
+    'lom.educational.context' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:context/imsd:value/imsd:langstring',
+    'lom.educationa.typicallearningtime' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:typicallearningtime/imsd:datetime',
+    'lom.educational.description' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:description/imsd:langstring',
+#    'educational.language' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:language',
+#    'relation' : '/top:manifest/top:metadata/imsd:lom/imsd:relation/imsd:resource/imsd:description/imsd:langstring',
+    'lom.classification' : '/top:manifest/top:metadata/imsd:lom/imsd:classification/imsd:taxonpath/imsd:taxon/imsd:entry/imsd:langstring',
+    'lom.classification.type' : '/top:manifest/top:metadata/imsd:lom/imsd:classification/imsd:taxonpath/imsd:source/imsd:langstring',
 }
 
 def search(q, xml):
