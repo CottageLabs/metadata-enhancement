@@ -15,7 +15,10 @@ data = {
     'dc.contributor.author[en]' : {1 : ["University of Here"], 2: ["College of Hard Knocks"], 3: [''], 4: ['contributor'], 5: ['Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard'], 6: ['uclanoer'], 7: ['uclan']},
     'dc.contributor.author[English]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[en-gb]' : {1 : ["publisher1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    'dc.publisher[en]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    
+    'dc.publisher[en]' : {1 : [""], 2: [""], 3: ['University of Glamorgan'], 4: ['Diamond Dragon School'], 5: ['Bond, James Bond'], 6: ['Archmage College'], 7: ['']},
+    'dc.publisher' : {1 : ["test"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.publisher[en-gb]' : {1 : ["test", 'test2'], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     
     'dc.creator[]' : {1 : ["creator1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.creator' : {1 : [""], 2: ["creator2; creator3"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
@@ -535,3 +538,29 @@ class TestRules(unittest.TestCase):
             len(w.csv_dict['dc.identifier.uri'][6]) == 0
         
         assert w.csv_dict['dc.identifier.uri'][7][0] == 'this resource is scottish'
+        
+    def test_13a_publisher(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule13a_publisher(w)
+        
+        assert not w.csv_dict.has_key('dc.publisher')
+        assert not w.csv_dict.has_key('dc.publisher[en-gb]')
+        assert w.csv_dict.has_key('dc.publisher[en]')
+
+        assert len(w.csv_dict['dc.publisher[en]'][1]) == 2
+        assert w.csv_dict['dc.publisher[en]'][1][0] == 'test'
+        assert w.csv_dict['dc.publisher[en]'][1][1] == 'test2'
+        
+    def test_13b_publisher(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule13b_publisher(w)
+        
+        assert w.csv_dict.has_key('note.dc.publisher[en]')
+        
+        assert w.csv_dict['note.dc.publisher[en]'][3][0] == ''
+        assert w.csv_dict['note.dc.publisher[en]'][4][0] == ''
+        assert w.csv_dict['note.dc.publisher[en]'][5][0] == 'possible person name'
+        assert w.csv_dict['note.dc.publisher[en]'][6][0] == ''
+        
