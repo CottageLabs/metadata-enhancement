@@ -119,19 +119,15 @@ def rule2d_author(csv_wrapper):
 def rule2e_author(csv_wrapper):
     csv_wrapper.merge_columns('dc.contributor.author[en-gb]', 'dc.publisher[en]')
 
-# 2.f. merge dc.creator into dc.contributor.author[en]
-def rule2f_author(csv_wrapper):
-    pass
-
-# 2.g. if value == 'contributor', delete it (only Author columns)
+# 2.f. if value == 'contributor', delete it (only Author columns)
 # dc.contributor.author[en] should be the only Author column left at this point
-def rule2g_author(csv_wrapper):
+def rule2f_author(csv_wrapper):
     item_ids = csv_wrapper.find_in_column('dc.contributor.author[en]', 'contributor')
     for item_id in item_ids:
         csv_wrapper.delete_contents('dc.contributor.author[en]', item_id)
 
-# 2.h. if value is a VCARD, get the name and leave only the name
-def rule2h_author(csv_wrapper):
+# 2.g. if value is a VCARD, get the name and leave only the name
+def rule2g_author(csv_wrapper):
     def replace_vcard(data):
         if 'vcard' in data:
             # The example of a VCARD that we have starts with the name
@@ -147,8 +143,8 @@ def rule2h_author(csv_wrapper):
         
     csv_wrapper.apply_value_function('dc.contributor.author[en]', replace_vcard)
     
-# 2.i. Copy all organisation names to dc.publisher[en] where possible.
-def rule2i_author(csv_wrapper):
+# 2.h. Copy all organisation names to dc.publisher[en] where possible.
+def rule2h_author(csv_wrapper):
     src = 'dc.contributor.author[en]'
     dst = 'dc.publisher[en]'
     
@@ -159,8 +155,8 @@ def rule2i_author(csv_wrapper):
     csv_wrapper.c2c_copy_by_value_function(src, dst, is_known_org)
     
     
-# 2.j. if value == 'uclanoer' || value == 'uclan' -> delete value
-def rule2j_author(csv_wrapper):
+# 2.i. if value == 'uclanoer' || value == 'uclan' -> delete value
+def rule2i_author(csv_wrapper):
     def delete_uclan_uclanoer_authors(data):
         if data == 'uclan' or data == 'uclanoer':
             return None
