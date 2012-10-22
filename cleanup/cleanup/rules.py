@@ -72,7 +72,7 @@ def rule1b_advisor(csv_wrapper):
         csv_wrapper.add_value('dc.publisher[en]', item_id, 'DIPEx')
         csv_wrapper.delete_value(working_on, item_id, 'DiPEX')
     
-    # 1.b.iii. iCase bioukoer (x3) -> dc.subject, split by whitespace, add ukoer to subject also
+    # 1.b.iii. iCase bioukoer (x3) -> dc.subject[en], split by whitespace, add ukoer to subject also
     item_ids = csv_wrapper.find_in_column(working_on, 'iCase bioukoer')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.subject[en]', item_id, *['iCase', 'bioukoer', 'ukoer'])
@@ -84,7 +84,7 @@ def rule1b_advisor(csv_wrapper):
         csv_wrapper.add_value('dc.contributor.author[en]', item_id, 'Rong Yang')
         csv_wrapper.delete_value(working_on, item_id, 'Rong Yang')
         
-    # 1.b.v. UCLAN (x1) -> delete value, add uclanoer to dc.subject
+    # 1.b.v. UCLAN (x1) -> delete value, add uclanoer to dc.subject[en]
     item_ids = csv_wrapper.find_in_column(working_on, 'UCLAN')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.subject[en]', item_id, 'uclanoer')
@@ -371,7 +371,7 @@ def rule7f_date(csv_wrapper):
 # 8. Description columns
 #############################################################
 
-# 8.a. delete dc.description.uri
+# 8.a. delete dc.description.uri[en]
 def rule8a_description(csv_wrapper):
     csv_wrapper.delete_column("dc.description.uri[en]")
 
@@ -416,11 +416,6 @@ def rule10b_language(csv_wrapper):
     csv_wrapper.merge_columns("dc.language[en]", "dc.language")
     csv_wrapper.merge_columns("dc.language[fr]", "dc.language")
 
-# 10.c. validate and convert all language codes to <two-letter>[-<two letter>] form
-
-# Decision taken to NOT touch the language codes since future data could come 
-# in any format. Instead, the indexing will take care of the varied codes.
-
 # 11. Title columns
 #############################################################
 
@@ -441,7 +436,7 @@ def rule11b_title(csv_wrapper):
 # 12. Identifier columns:
 ############################################################
 
-# 12.a. merge dc.identifier.uri, dc.identifier.uri[] and dc.identifier.uri[en]
+# 12.a. merge dc.identifier.uri, dc.identifier.uri[] into dc.identifier.uri[en]
 def rule12a_identifier(csv_wrapper):
     csv_wrapper.merge_columns("dc.identifier.uri[]", "dc.identifier.uri")
     csv_wrapper.merge_columns("dc.identifier.uri[en]", "dc.identifier.uri")
@@ -525,12 +520,6 @@ def rule14e_general(csv_wrapper):
     ids = csv_wrapper.find_by_value_function("dc.subject", detect_long)
     csv_wrapper.add_column("note.dc.subject")
     csv_wrapper.set_value("note.dc.subject", ids, "long subject")
-
-# 14.f. auto-detect items which would have the defunct "Mathematical and Computer Science" JACS code
-# FIXME: do we still need this?
-# ET: No. We're moving everything to I100. TODO correct the spec, leave a comment or del. this point.
-def rule14f_general(csv_wrapper):
-    pass
 
 # 15. LOM columns:
 ##############################################################
