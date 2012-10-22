@@ -68,8 +68,10 @@ runrules = [
     rules.rule2a_author, rules.rule2b_author, rules.rule2c_author,  # deal with the author column group
     rules.rule2d_author, rules.rule2e_author, rules.rule2f_author,  #
     rules.rule2g_author, rules.rule2h_author, rules.rule2i_author,  #
-    rules.rule3a_creator, rules.rule3b_creator,  # deal with creator column group
-    rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor, # contributor column group
+    rules.rule3a_creator, rules.rule3b_creator, # deal with creator column group
+    rules.rule3c_creator, #
+    rules.rule4a_contributor, rules.rule4b_contributor, # contributor column group
+    rules.rule4c_contributor, rules.rule4d_contributor, #
     rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, # subject column group
     rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject, #
     rules.rule6a_coverage, rules.rule6b_coverage, # coverage columns
