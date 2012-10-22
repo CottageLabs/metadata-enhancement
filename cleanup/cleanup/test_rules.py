@@ -97,20 +97,20 @@ class TestRules(unittest.TestCase):
         
         # 'DiPEX' -> move to dc.publisher as DIPEx
         assert "DIPEx" in w.csv_dict['dc.publisher[en]'][4]
-        assert w.csv_dict['dc.contributor.advisor[en]'][4][0] == ""
+        assert len(w.csv_dict['dc.contributor.advisor[en]'][4]) == 0
         
         # 'iCase bioukoer' -> delete value and add 'iCase', 'bioukoer', 'ukoer' to dc.subject[en]
         assert "iCase" in w.csv_dict['dc.subject[en]'][5]
         assert "bioukoer" in w.csv_dict['dc.subject[en]'][5]
         assert "ukoer" in w.csv_dict['dc.subject[en]'][5]
-        assert w.csv_dict['dc.contributor.advisor[en]'][5][0] == ""
+        assert len(w.csv_dict['dc.contributor.advisor[en]'][5]) == 0
         
         # 'Rong Yang' -> move to 'dc.contributor.author[en]'
-        assert w.csv_dict['dc.contributor.advisor[en]'][6][0] == ""
+        assert len(w.csv_dict['dc.contributor.advisor[en]'][6]) == 0
         assert "Rong Yang" in w.csv_dict['dc.contributor.author[en]'][6]
         
         # UCLAN -> delete value and add uclanoer to dc.subject[en]
-        assert w.csv_dict['dc.contributor.advisor[en]'][7][0] == ""
+        assert len(w.csv_dict['dc.contributor.advisor[en]'][7]) == 0
         assert "uclanoer" in w.csv_dict['dc.subject[en]'][7]
         
     def test_1c_advisor(self):
@@ -164,7 +164,7 @@ class TestRules(unittest.TestCase):
         
         rules.rule2f_author(w)
         
-        assert w.csv_dict['dc.contributor.author[en]'][4][0] == ""
+        assert len(w.csv_dict['dc.contributor.author[en]'][4]) == 0
      
     def test_2g_author(self):
         w = deepcopy(wrapper)

@@ -184,3 +184,13 @@ class TestCsvWrapper(unittest.TestCase):
         # the last element in the first item in dc.title should have been 
         # copied over from dc.source - findme
         assert w.csv_dict['dc.title'][1][-1:][0] == 'findme'
+        
+    def test_14_delete_value(self):
+        w = deepcopy(wrapper)
+        
+        desc_3_len = len(w.csv_dict['dc.description'][3])
+        
+        w.delete_value('dc.description', 3, 'desc3')
+        
+        assert len(w.csv_dict['dc.description'][3]) == desc_3_len - 1
+        assert 'desc3' not in w.csv_dict['dc.description'][3]

@@ -70,25 +70,25 @@ def rule1b_advisor(csv_wrapper):
     item_ids = csv_wrapper.find_in_column(working_on, 'DiPEX')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.publisher[en]', item_id, 'DIPEx')
-        csv_wrapper.delete_contents(working_on, item_id)
+        csv_wrapper.delete_value(working_on, item_id, 'DiPEX')
     
     # 1.b.iii. iCase bioukoer (x3) -> dc.subject, split by whitespace, add ukoer to subject also
     item_ids = csv_wrapper.find_in_column(working_on, 'iCase bioukoer')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.subject[en]', item_id, *['iCase', 'bioukoer', 'ukoer'])
-        csv_wrapper.delete_contents(working_on, item_id)
+        csv_wrapper.delete_value(working_on, item_id, 'iCase bioukoer')
     
     # 1.b.iv. Rong Yang (x1) -> move to dc.contributor.author[en]
     item_ids = csv_wrapper.find_in_column(working_on, 'Rong Yang')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.contributor.author[en]', item_id, 'Rong Yang')
-        csv_wrapper.delete_contents(working_on, item_id)
+        csv_wrapper.delete_value(working_on, item_id, 'Rong Yang')
         
     # 1.b.v. UCLAN (x1) -> delete value, add uclanoer to dc.subject
     item_ids = csv_wrapper.find_in_column(working_on, 'UCLAN')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.subject[en]', item_id, 'uclanoer')
-        csv_wrapper.delete_contents(working_on, item_id)
+        csv_wrapper.delete_value(working_on, item_id, 'UCLAN')
     
 # 1.c. delete Advisor column group
 # dc.contributor.advisor[en] should be the only column left from the Advisor group by now
@@ -124,7 +124,7 @@ def rule2e_author(csv_wrapper):
 def rule2f_author(csv_wrapper):
     item_ids = csv_wrapper.find_in_column('dc.contributor.author[en]', 'contributor')
     for item_id in item_ids:
-        csv_wrapper.delete_contents('dc.contributor.author[en]', item_id)
+        csv_wrapper.delete_value('dc.contributor.author[en]', item_id, 'contributor')
 
 # 2.g. if value is a VCARD, get the name and leave only the name
 def rule2g_author(csv_wrapper):

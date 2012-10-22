@@ -289,10 +289,34 @@ class CSVWrapper(object):
         """
         Deletes the contents of a cell specified by the column and Jorum item ID.
         """
-        # Maybe do sth. like self.set_contents(column, item_id, '')
         if not self.csv_dict.has_key(column) or not self.csv_dict[column].has_key(item_id):
             return
         self.csv_dict[column][item_id] = ['']
+
+    def delete_value(self, column, item_id, del_value):
+        """
+        Deletes the specified value from the contents of the cell specified by the column and Jorum item ID.
+        """
+        if not self.csv_dict.has_key(column) or not self.csv_dict[column].has_key(item_id):
+            return
+        
+        # normalise representation of all values in specified cell
+        cell_norm = []
+        map = {}
+        
+        for v in self.csv_dict[column][item_id]:
+            v_norm = v.strip().lower()
+            
+            cell_norm.append(v_norm)
+            map[v_norm] = v
+        
+        # delete all instances of specified value to be deleted
+        cmpval = del_value.strip().lower()
+        cell_norm = [v for v in cell_norm if v != cmpval]
+        
+        # put the remaining values back into the cell using their original 
+        # representations
+        self.csv_dict[column][item_id] = [map[v] for v in cell_norm]
         
     def set_value(self, column, item_ids, value):
         """
