@@ -23,6 +23,7 @@ data = {
     'dc.contributor' : {1 : ["test@test.com", "bob@example.com"], 2: ["University of Somewhere"], 3: ['alice@example.com'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor[x-none]' : {1 : ["University of Over There"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.other[en]' : {1 : ["other1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.contributor[en]' : {1 : ["SHIELD"], 2: ["Cat's Paws Sanctuary", 'Splott'], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['UCLAN']},
     
     "dc.subject[en]" : {1 : [" de-normalised  spacing    here "], 2: ['"quoted"', 'unquoted'], 3: ['Upper Case'], 4: ['split; this'], 5: ['and, this', 'but not this'], 6: [''], 7: ['']},
     "dc.subject[EN]" : {1 : ["subject1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
@@ -251,6 +252,23 @@ class TestRules(unittest.TestCase):
         assert "University of Over There" in w.csv_dict['dc.publisher[en]'][1]
         assert not w.csv_dict.has_key('dc.contributor[x-none]')
 
+    def test_4d_contributor(self):
+        w = deepcopy(wrapper)
+        
+        author_7_len = len(w.csv_dict['dc.contributor.author[en]'][7])
+        
+        rules.rule4d_contributor(w)
+        
+        assert not w.csv_dict.has_key('dc.contributor[en]')
+        assert w.csv_dict.has_key('dc.contributor.author[en]')
+        
+        assert w.csv_dict['dc.contributor.author[en]'][1][-1] == 'SHIELD'
+        assert w.csv_dict['dc.contributor.author[en]'][2][-2] == "Cat's Paws Sanctuary"
+        assert w.csv_dict['dc.contributor.author[en]'][2][-1] == 'Splott'
+        # 'UCLAN' should have been detected as being the same as 'uclan'
+        # and NOT merged, leaving the legth of that field the same
+        assert len(w.csv_dict['dc.contributor.author[en]'][7]) == author_7_len
+        
     def test_5a_subject(self):
         w = deepcopy(wrapper)
         

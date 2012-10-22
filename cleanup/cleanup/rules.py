@@ -210,6 +210,10 @@ def rule4b_contributor(csv_wrapper):
 def rule4c_contributor(csv_wrapper):
     csv_wrapper.merge_columns('dc.contributor[x-none]', 'dc.publisher[en]')
     
+# 4.d. merge dc.contributor[en] into dc.contributor.author[en]
+def rule4d_contributor(csv_wrapper):
+    csv_wrapper.merge_columns('dc.contributor[en]', 'dc.contributor.author[en]')
+    
 # 5. Subject column group
 ###########################################################
 
