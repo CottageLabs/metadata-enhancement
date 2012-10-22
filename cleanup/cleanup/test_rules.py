@@ -207,6 +207,24 @@ class TestRules(unittest.TestCase):
         assert "creator2" in w.csv_dict['dc.creator'][2], w.csv_dict['dc.creator']
         assert "creator3" in w.csv_dict['dc.creator'][2]
     
+    def test_3c_creator(self):
+        w = deepcopy(wrapper)
+        
+        author_2_len = len(w.csv_dict['dc.contributor.author[en]'][2])
+        
+        rules.rule3c_creator(w)
+        
+        # check columns have been deleted / kept as appropriate
+        assert not w.csv_dict.has_key('dc.creator')
+        assert w.csv_dict.has_key('dc.contributor.author[en]')
+        
+        # check length
+        assert len(w.csv_dict['dc.contributor.author[en]'][2]) == author_2_len + 1
+        
+        # now check for the merged content
+        assert w.csv_dict['dc.contributor.author[en]'][2][-1] == 'creator2; creator3'
+        
+    
     def test_4a_contributor(self):
         w = deepcopy(wrapper)
         

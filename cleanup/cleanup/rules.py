@@ -185,6 +185,11 @@ def rule3b_creator(csv_wrapper):
         
     csv_wrapper.apply_cell_function('dc.creator', split_by_semicolon)
     
+# 3.c. merge dc.creator into dc.contributor.author[en], effectively 
+# eliminating the Creator column group
+def rule3c_creator(csv_wrapper):
+    csv_wrapper.merge_columns('dc.creator', 'dc.contributor.author[en]')
+    
 # 4. Contributor column group
 ###########################################################
 
