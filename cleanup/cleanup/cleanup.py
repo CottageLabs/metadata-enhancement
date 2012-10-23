@@ -64,21 +64,33 @@ else: # run all of the rules
 
 # For the moment, manually code the rules
 runrules = [
-    rules.rule1a_advisor, rules.rule1b_advisor, rules.rule1c_advisor, # deal with the advisor column group
-    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author,  # deal with the author column group
-    rules.rule2d_author, rules.rule2e_author, rules.rule2f_author,  #
-    rules.rule2g_author, rules.rule2h_author, rules.rule2i_author,  #
-    rules.rule3a_creator, rules.rule3b_creator, # deal with creator column group
-    rules.rule3c_creator, #
-    rules.rule4a_contributor, rules.rule4b_contributor, # contributor column group
-    rules.rule4c_contributor, rules.rule4d_contributor, #
-    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, # subject column group
-    rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject, #
-    rules.rule6a_coverage, rules.rule6b_coverage, # coverage columns
-    rules.rule7a_date, rules.rule7b_date, rules.rule7c_date,    # date column group
-    rules.rule7d_date, rules.rule7e_date, rules.rule7f_date,    #
-    rules.rule8a_description, rules.rule8b_description, rules.rule8c_description # description column group
-    ]
+    # advisor
+    rules.rule1a_advisor, rules.rule1b_advisor, rules.rule1c_advisor,
+    # author
+    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author, rules.rule2d_author, rules.rule2e_author, rules.rule2f_author, rules.rule2g_author, rules.rule2h_author, rules.rule2i_author, 
+    # creator
+    rules.rule3a_creator, rules.rule3b_creator, rules.rule3c_creator, 
+    # contributor
+    rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor, rules.rule4d_contributor, 
+    # subject
+    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject, 
+    # coverage
+    rules.rule6a_coverage, rules.rule6b_coverage, 
+    # date
+    rules.rule7a_date, rules.rule7b_date, rules.rule7c_date, rules.rule7d_date, rules.rule7e_date, rules.rule7f_date, 
+    # description
+    rules.rule8a_description, rules.rule8b_description, rules.rule8c_description,
+    # language
+    rules.rule10a_language, rules.rule10b_language, 
+    # title
+    rules.rule11a_title, rules.rule11b_title, 
+    # identifier
+    rules.rule12a_identifier, 
+    # publisher
+    rules.rule13a_publisher, rules.rule13b_publisher, 
+    # general tidying
+    rules.rule14a_general, rules.rule14c_general, rules.rule14d_general, rules.rule14e_general
+]
 
 # load the csv
 print "Loading csv from " + CSV + " ..."
