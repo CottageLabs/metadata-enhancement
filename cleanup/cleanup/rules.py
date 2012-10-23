@@ -482,13 +482,10 @@ def rule14a_general(csv_wrapper):
 def rule14c_general(csv_wrapper):
     # dc.contributor.author[en]
     # dc.subject
-    # dc.contributor[en]
     
     ids1 = csv_wrapper.find_by_value_function("dc.contributor.author[en]", may_be_org)
     ids2 = csv_wrapper.find_by_value_function("dc.subject", may_be_org)
-    ids3 = csv_wrapper.find_by_value_function("dc.contributor[en]", may_be_org)
     ids = ids1 + [x for x in ids2 if x not in ids1]
-    ids = ids + [x for x in ids3 if x not in ids]
     csv_wrapper.add_column("note.organisations")
     csv_wrapper.set_value("note.organisations", ids, "possible org name")
 
