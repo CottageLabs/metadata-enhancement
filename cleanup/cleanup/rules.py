@@ -483,7 +483,6 @@ def rule14c_general(csv_wrapper):
     # dc.contributor.author[en]
     # dc.subject
     # dc.contributor[en]
-    # dc.creator
     def detect_org(value):
         if value == "":
             return False
@@ -495,13 +494,12 @@ def rule14c_general(csv_wrapper):
         if "college" in compare:
             return True
         return False
+    
     ids1 = csv_wrapper.find_by_value_function("dc.contributor.author[en]", detect_org)
     ids2 = csv_wrapper.find_by_value_function("dc.subject", detect_org)
     ids3 = csv_wrapper.find_by_value_function("dc.contributor[en]", detect_org)
-    ids4 = csv_wrapper.find_by_value_function("dc.creator", detect_org)
     ids = ids1 + [x for x in ids2 if x not in ids1]
     ids = ids + [x for x in ids3 if x not in ids]
-    ids = ids + [x for x in ids4 if x not in ids]
     csv_wrapper.add_column("note.organisations")
     csv_wrapper.set_value("note.organisations", ids, "possible org name")
 

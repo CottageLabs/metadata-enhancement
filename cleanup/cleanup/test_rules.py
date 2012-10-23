@@ -564,3 +564,9 @@ class TestRules(unittest.TestCase):
         assert w.csv_dict['note.dc.publisher[en]'][5][0] == 'possible person name'
         assert w.csv_dict['note.dc.publisher[en]'][6][0] == ''
         
+    def test_14c_general(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule14c_general(w)
+        
+        
