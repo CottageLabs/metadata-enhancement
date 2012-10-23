@@ -313,7 +313,7 @@ class CSVWrapper(object):
             v = []
             if id in column.keys():
                 v = column[id]
-            existing = self.csv_dict[column_name][id]
+            existing = self.csv_dict[column_name].get(id, [])
             new = self._combine(v, existing)
             self.csv_dict[column_name][id] = new
 
