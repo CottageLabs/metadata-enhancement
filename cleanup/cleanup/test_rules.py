@@ -5,17 +5,18 @@ from copy import deepcopy
 # 1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']
 data = {
     'dc.contributor.advisor[]': {1 : ["advisor1"], 2: ["advisor2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    'dc.contributor.advisor[en]': {1 : [""], 2 : ["advisor3"], 3: ['conadv'], 4: ['DiPEX'], 
-                                    5: ['iCase bioukoer'], 6: ['Rong Yang'], 7: ['UCLAN']},
-    "dc.contributor.author[en]" : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    
+    'dc.contributor.advisor[en]': {1 : [""], 2 : ["advisor3"], 3: ['conadv'], 4: ['DiPEX'], 5: ['iCase bioukoer'], 6: ['Rong Yang'], 7: ['UCLAN']},
+                                    
     'dc.contributor.author[]' : {1 : ["author1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author' : {1 : [""], 2: [""], 3: ['author3'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[x-none]' : {1 : [""], 2: ["author2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[en]' : {1 : ["University of Here"], 2: ["College of Hard Knocks"], 3: [''], 4: ['contributor'], 5: ['Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard'], 6: ['uclanoer'], 7: ['uclan']},
     'dc.contributor.author[English]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[en-gb]' : {1 : ["publisher1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    'dc.publisher[en]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    
+    'dc.publisher[en]' : {1 : [""], 2: [""], 3: ['University of Glamorgan'], 4: ['Diamond Dragon School'], 5: ['Bond, James Bond'], 6: ['Archmage College'], 7: ['']},
+    'dc.publisher' : {1 : ["test"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.publisher[en-gb]' : {1 : ["test", 'test2'], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['test.email@example.com']},
     
     'dc.creator[]' : {1 : ["creator1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.creator' : {1 : [""], 2: ["creator2; creator3"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
@@ -23,12 +24,13 @@ data = {
     'dc.contributor' : {1 : ["test@test.com", "bob@example.com"], 2: ["University of Somewhere"], 3: ['alice@example.com'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor[x-none]' : {1 : ["University of Over There"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.other[en]' : {1 : ["other1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.contributor[en]' : {1 : ["SHIELD"], 2: ["Cat's Paws Sanctuary", 'Splott'], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['UCLAN']},
     
-    "dc.subject[en]" : {1 : [" de-normalised  spacing    here "], 2: ['"quoted"', 'unquoted'], 3: ['Upper Case'], 4: ['split; this'], 5: ['and, this', 'but not this'], 6: [''], 7: ['']},
+    "dc.subject[en]" : {1 : [" de-normalised  spacing    here "], 2: ['"quoted"', 'unquoted'], 3: ['Upper Case'], 4: ['split; this'], 5: ['and, this', 'but not this'], 6: ['Fairy College'], 7: ['wrong separation, of keywords, evil laughter']},
     "dc.subject[EN]" : {1 : ["subject1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     "dc.subject[]" : {1 : [""], 2: ["subject2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    "dc.subject[en-gb]" : {1 : ["subject3"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    "dc.subject[ene]" : {1 : [""], 2: ["subject4"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    "dc.subject[en-gb]" : {1 : ["subject3"], 2: [""], 3: [''], 4: [''], 5: ['another+test_of.emails.heh@sub.domain.tld', 'normal subject'], 6: [''], 7: ['']},
+    "dc.subject[ene]" : {1 : [""], 2: ["subject4"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['dup', 'dup', 'dup', 'dup']},
     
     'dc.subject.classification[]': {1 : ["class1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.subject.classification[en]': {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
@@ -96,20 +98,20 @@ class TestRules(unittest.TestCase):
         
         # 'DiPEX' -> move to dc.publisher as DIPEx
         assert "DIPEx" in w.csv_dict['dc.publisher[en]'][4]
-        assert w.csv_dict['dc.contributor.advisor[en]'][4][0] == ""
+        assert len(w.csv_dict['dc.contributor.advisor[en]'][4]) == 0
         
         # 'iCase bioukoer' -> delete value and add 'iCase', 'bioukoer', 'ukoer' to dc.subject[en]
         assert "iCase" in w.csv_dict['dc.subject[en]'][5]
         assert "bioukoer" in w.csv_dict['dc.subject[en]'][5]
         assert "ukoer" in w.csv_dict['dc.subject[en]'][5]
-        assert w.csv_dict['dc.contributor.advisor[en]'][5][0] == ""
+        assert len(w.csv_dict['dc.contributor.advisor[en]'][5]) == 0
         
         # 'Rong Yang' -> move to 'dc.contributor.author[en]'
-        assert w.csv_dict['dc.contributor.advisor[en]'][6][0] == ""
+        assert len(w.csv_dict['dc.contributor.advisor[en]'][6]) == 0
         assert "Rong Yang" in w.csv_dict['dc.contributor.author[en]'][6]
         
         # UCLAN -> delete value and add uclanoer to dc.subject[en]
-        assert w.csv_dict['dc.contributor.advisor[en]'][7][0] == ""
+        assert len(w.csv_dict['dc.contributor.advisor[en]'][7]) == 0
         assert "uclanoer" in w.csv_dict['dc.subject[en]'][7]
         
     def test_1c_advisor(self):
@@ -163,7 +165,7 @@ class TestRules(unittest.TestCase):
         
         rules.rule2f_author(w)
         
-        assert w.csv_dict['dc.contributor.author[en]'][4][0] == ""
+        assert len(w.csv_dict['dc.contributor.author[en]'][4]) == 0
      
     def test_2g_author(self):
         w = deepcopy(wrapper)
@@ -207,6 +209,24 @@ class TestRules(unittest.TestCase):
         assert "creator2" in w.csv_dict['dc.creator'][2], w.csv_dict['dc.creator']
         assert "creator3" in w.csv_dict['dc.creator'][2]
     
+    def test_3c_creator(self):
+        w = deepcopy(wrapper)
+        
+        author_2_len = len(w.csv_dict['dc.contributor.author[en]'][2])
+        
+        rules.rule3c_creator(w)
+        
+        # check columns have been deleted / kept as appropriate
+        assert not w.csv_dict.has_key('dc.creator')
+        assert w.csv_dict.has_key('dc.contributor.author[en]')
+        
+        # check length
+        assert len(w.csv_dict['dc.contributor.author[en]'][2]) == author_2_len + 1
+        
+        # now check for the merged content
+        assert w.csv_dict['dc.contributor.author[en]'][2][-1] == 'creator2; creator3'
+        
+    
     def test_4a_contributor(self):
         w = deepcopy(wrapper)
         
@@ -233,6 +253,23 @@ class TestRules(unittest.TestCase):
         assert "University of Over There" in w.csv_dict['dc.publisher[en]'][1]
         assert not w.csv_dict.has_key('dc.contributor[x-none]')
 
+    def test_4d_contributor(self):
+        w = deepcopy(wrapper)
+        
+        author_7_len = len(w.csv_dict['dc.contributor.author[en]'][7])
+        
+        rules.rule4d_contributor(w)
+        
+        assert not w.csv_dict.has_key('dc.contributor[en]')
+        assert w.csv_dict.has_key('dc.contributor.author[en]')
+        
+        assert w.csv_dict['dc.contributor.author[en]'][1][-1] == 'SHIELD'
+        assert w.csv_dict['dc.contributor.author[en]'][2][-2] == "Cat's Paws Sanctuary"
+        assert w.csv_dict['dc.contributor.author[en]'][2][-1] == 'Splott'
+        # 'UCLAN' should have been detected as being the same as 'uclan'
+        # and NOT merged, leaving the legth of that field the same
+        assert len(w.csv_dict['dc.contributor.author[en]'][7]) == author_7_len
+        
     def test_5a_subject(self):
         w = deepcopy(wrapper)
         
@@ -499,3 +536,65 @@ class TestRules(unittest.TestCase):
             len(w.csv_dict['dc.identifier.uri'][6]) == 0
         
         assert w.csv_dict['dc.identifier.uri'][7][0] == 'this resource is scottish'
+        
+    def test_13a_publisher(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule13a_publisher(w)
+        
+        assert not w.csv_dict.has_key('dc.publisher')
+        assert not w.csv_dict.has_key('dc.publisher[en-gb]')
+        assert w.csv_dict.has_key('dc.publisher[en]')
+
+        assert len(w.csv_dict['dc.publisher[en]'][1]) == 2
+        assert w.csv_dict['dc.publisher[en]'][1][0] == 'test'
+        assert w.csv_dict['dc.publisher[en]'][1][1] == 'test2'
+        
+    def test_13b_publisher(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule13b_publisher(w)
+        
+        assert w.csv_dict.has_key('note.dc.publisher[en]')
+        ''
+        assert w.csv_dict['note.dc.publisher[en]'][3][0] == ''
+        assert w.csv_dict['note.dc.publisher[en]'][4][0] == ''
+        assert w.csv_dict['note.dc.publisher[en]'][5][0] == 'possible person name'
+        assert w.csv_dict['note.dc.publisher[en]'][6][0] == ''
+        
+    def test_14a_general(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule14a_general(w)
+        
+        assert len(w.csv_dict['dc.subject[ene]'][7]) == 1
+        assert w.csv_dict['dc.subject[ene]'][7][0] == 'dup'
+        
+    def test_14c_general(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule14c_general(w)
+        
+        assert w.csv_dict.has_key('note.organisations')
+        assert w.csv_dict['note.organisations'][1][0] == 'possible org name'
+        assert w.csv_dict['note.organisations'][2][0] == 'possible org name'
+        assert w.csv_dict['note.organisations'][5][0] == 'possible org name'
+        assert w.csv_dict['note.organisations'][6][0] == 'possible org name'
+        
+    def test_14d_general(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule14d_general(w)
+        
+        assert w.csv_dict['dc.publisher[en-gb]'][7][0] == ''
+        assert w.csv_dict['dc.contributor'][1][0] == ''
+        assert len(w.csv_dict['dc.subject[en-gb]'][5]) == 1
+        assert w.csv_dict['dc.subject[en-gb]'][5][0] == 'normal subject'
+        
+    def test_14e_general(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule14e_general(w)
+        
+        assert w.csv_dict.has_key('note.dc.subject[en]')
+        assert w.csv_dict['note.dc.subject[en]'][7][0] == 'long subject'

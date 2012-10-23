@@ -70,25 +70,25 @@ def rule1b_advisor(csv_wrapper):
     item_ids = csv_wrapper.find_in_column(working_on, 'DiPEX')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.publisher[en]', item_id, 'DIPEx')
-        csv_wrapper.delete_contents(working_on, item_id)
+        csv_wrapper.delete_value(working_on, item_id, 'DiPEX')
     
-    # 1.b.iii. iCase bioukoer (x3) -> dc.subject, split by whitespace, add ukoer to subject also
+    # 1.b.iii. iCase bioukoer (x3) -> dc.subject[en], split by whitespace, add ukoer to subject also
     item_ids = csv_wrapper.find_in_column(working_on, 'iCase bioukoer')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.subject[en]', item_id, *['iCase', 'bioukoer', 'ukoer'])
-        csv_wrapper.delete_contents(working_on, item_id)
+        csv_wrapper.delete_value(working_on, item_id, 'iCase bioukoer')
     
     # 1.b.iv. Rong Yang (x1) -> move to dc.contributor.author[en]
     item_ids = csv_wrapper.find_in_column(working_on, 'Rong Yang')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.contributor.author[en]', item_id, 'Rong Yang')
-        csv_wrapper.delete_contents(working_on, item_id)
+        csv_wrapper.delete_value(working_on, item_id, 'Rong Yang')
         
-    # 1.b.v. UCLAN (x1) -> delete value, add uclanoer to dc.subject
+    # 1.b.v. UCLAN (x1) -> delete value, add uclanoer to dc.subject[en]
     item_ids = csv_wrapper.find_in_column(working_on, 'UCLAN')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.subject[en]', item_id, 'uclanoer')
-        csv_wrapper.delete_contents(working_on, item_id)
+        csv_wrapper.delete_value(working_on, item_id, 'UCLAN')
     
 # 1.c. delete Advisor column group
 # dc.contributor.advisor[en] should be the only column left from the Advisor group by now
@@ -124,7 +124,7 @@ def rule2e_author(csv_wrapper):
 def rule2f_author(csv_wrapper):
     item_ids = csv_wrapper.find_in_column('dc.contributor.author[en]', 'contributor')
     for item_id in item_ids:
-        csv_wrapper.delete_contents('dc.contributor.author[en]', item_id)
+        csv_wrapper.delete_value('dc.contributor.author[en]', item_id, 'contributor')
 
 # 2.g. if value is a VCARD, get the name and leave only the name
 def rule2g_author(csv_wrapper):
@@ -185,6 +185,11 @@ def rule3b_creator(csv_wrapper):
         
     csv_wrapper.apply_cell_function('dc.creator', split_by_semicolon)
     
+# 3.c. merge dc.creator into dc.contributor.author[en], effectively 
+# eliminating the Creator column group
+def rule3c_creator(csv_wrapper):
+    csv_wrapper.merge_columns('dc.creator', 'dc.contributor.author[en]')
+    
 # 4. Contributor column group
 ###########################################################
 
@@ -204,6 +209,10 @@ def rule4b_contributor(csv_wrapper):
 # In other words, merge dc.contributor[x-none] INTO dc.publisher[en]
 def rule4c_contributor(csv_wrapper):
     csv_wrapper.merge_columns('dc.contributor[x-none]', 'dc.publisher[en]')
+    
+# 4.d. merge dc.contributor[en] into dc.contributor.author[en]
+def rule4d_contributor(csv_wrapper):
+    csv_wrapper.merge_columns('dc.contributor[en]', 'dc.contributor.author[en]')
     
 # 5. Subject column group
 ###########################################################
@@ -362,7 +371,7 @@ def rule7f_date(csv_wrapper):
 # 8. Description columns
 #############################################################
 
-# 8.a. delete dc.description.uri
+# 8.a. delete dc.description.uri[en]
 def rule8a_description(csv_wrapper):
     csv_wrapper.delete_column("dc.description.uri[en]")
 
@@ -407,11 +416,6 @@ def rule10b_language(csv_wrapper):
     csv_wrapper.merge_columns("dc.language[en]", "dc.language")
     csv_wrapper.merge_columns("dc.language[fr]", "dc.language")
 
-# 10.c. validate and convert all language codes to <two-letter>[-<two letter>] form
-
-# Decision taken to NOT touch the language codes since future data could come 
-# in any format. Instead, the indexing will take care of the varied codes.
-
 # 11. Title columns
 #############################################################
 
@@ -432,7 +436,7 @@ def rule11b_title(csv_wrapper):
 # 12. Identifier columns:
 ############################################################
 
-# 12.a. merge dc.identifier.uri, dc.identifier.uri[] and dc.identifier.uri[en]
+# 12.a. merge dc.identifier.uri, dc.identifier.uri[] into dc.identifier.uri[en]
 def rule12a_identifier(csv_wrapper):
     csv_wrapper.merge_columns("dc.identifier.uri[]", "dc.identifier.uri")
     csv_wrapper.merge_columns("dc.identifier.uri[en]", "dc.identifier.uri")
@@ -470,57 +474,40 @@ def rule13b_publisher(csv_wrapper):
 # 14.b. for all fields with multiple values, de-duplicate repeated values
 # this rule should cover both of these ...
 def rule14a_general(csv_wrapper):
-    csv_wrapper.deduplicate_values()
+    def strip_duplicates(values):
+        new_values = []
+        for value in values:
+            if value not in new_values:
+                new_values.append(value)
+        return new_values
+    csv_wrapper.apply_global_cell_function(strip_duplicates)
 
 # 14.c. auto-detect and flag instances of "university", "institution", 
 # "school", "college" etc, and report on the rows where these occur, for possible 
 # manual intervention
 def rule14c_general(csv_wrapper):
     # dc.contributor.author[en]
-    # dc.subject
-    # dc.contributor[en]
-    # dc.creator
-    def detect_org(value):
-        if value == "":
-            return False
-        compare = value.lower()
-        if "university" in compare:
-            return True
-        if "school" in compare:
-            return True
-        if "college" in compare:
-            return True
-        return False
-    ids1 = csv_wrapper.find_by_value_function("dc.contributor.author[en]", detect_org)
-    ids2 = csv_wrapper.find_by_value_function("dc.subject", detect_org)
-    ids3 = csv_wrapper.find_by_value_function("dc.contributor[en]", detect_org)
-    ids4 = csv_wrapper.find_by_value_function("dc.creator", detect_org)
+    # dc.subject[en]
+    
+    ids1 = csv_wrapper.find_by_value_function("dc.contributor.author[en]", may_be_org)
+    ids2 = csv_wrapper.find_by_value_function("dc.subject[en]", may_be_org)
     ids = ids1 + [x for x in ids2 if x not in ids1]
-    ids = ids + [x for x in ids3 if x not in ids]
-    ids = ids + [x for x in ids4 if x not in ids]
     csv_wrapper.add_column("note.organisations")
     csv_wrapper.set_value("note.organisations", ids, "possible org name")
 
 # 14.d. detect and delete all e-mail addresses (have a way to check it's a safe delete first)
 def rule14d_general(csv_wrapper):
-    csv_wrapper.apply_global_value_function(strip_email)
+    csv_wrapper.apply_global_cell_function(strip_email)
 
 # 14.e. detect subject keywords which are suspiciously long
 def rule14e_general(csv_wrapper):
-    def detect_long(values):
-        if len(values) != 1:
-            return False
-        if len(values[0]) > 30: # that would be a pretty long keyword
+    def detect_long(keyword):
+        if len(keyword) > 30: # that would be a pretty long keyword
             return True
         return False
-    ids = csv_wrapper.find_by_value_function("dc.subject", detect_long)
-    csv_wrapper.add_column("note.dc.subject")
-    csv_wrapper.set_value("note.dc.subject", ids, "long subject")
-
-# 14.f. auto-detect items which would have the defunct "Mathematical and Computer Science" JACS code
-# FIXME: do we still need this?
-def rule14f_general(csv_wrapper):
-    pass
+    ids = csv_wrapper.find_by_value_function("dc.subject[en]", detect_long)
+    csv_wrapper.add_column("note.dc.subject[en]")
+    csv_wrapper.set_value("note.dc.subject[en]", ids, "long subject")
 
 # 15. LOM columns:
 ##############################################################
