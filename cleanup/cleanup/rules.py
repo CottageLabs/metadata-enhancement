@@ -474,36 +474,40 @@ def rule13b_publisher(csv_wrapper):
 # 14.b. for all fields with multiple values, de-duplicate repeated values
 # this rule should cover both of these ...
 def rule14a_general(csv_wrapper):
-    csv_wrapper.deduplicate_values()
+    def strip_duplicates(values):
+        new_values = []
+        for value in values:
+            if value not in new_values:
+                new_values.append(value)
+        return new_values
+    csv_wrapper.apply_global_cell_function(strip_duplicates)
 
 # 14.c. auto-detect and flag instances of "university", "institution", 
 # "school", "college" etc, and report on the rows where these occur, for possible 
 # manual intervention
 def rule14c_general(csv_wrapper):
     # dc.contributor.author[en]
-    # dc.subject
+    # dc.subject[en]
     
     ids1 = csv_wrapper.find_by_value_function("dc.contributor.author[en]", may_be_org)
-    ids2 = csv_wrapper.find_by_value_function("dc.subject", may_be_org)
+    ids2 = csv_wrapper.find_by_value_function("dc.subject[en]", may_be_org)
     ids = ids1 + [x for x in ids2 if x not in ids1]
     csv_wrapper.add_column("note.organisations")
     csv_wrapper.set_value("note.organisations", ids, "possible org name")
 
 # 14.d. detect and delete all e-mail addresses (have a way to check it's a safe delete first)
 def rule14d_general(csv_wrapper):
-    csv_wrapper.apply_global_value_function(strip_email)
+    csv_wrapper.apply_global_cell_function(strip_email)
 
 # 14.e. detect subject keywords which are suspiciously long
 def rule14e_general(csv_wrapper):
-    def detect_long(values):
-        if len(values) != 1:
-            return False
-        if len(values[0]) > 30: # that would be a pretty long keyword
+    def detect_long(keyword):
+        if len(keyword) > 30: # that would be a pretty long keyword
             return True
         return False
-    ids = csv_wrapper.find_by_value_function("dc.subject", detect_long)
-    csv_wrapper.add_column("note.dc.subject")
-    csv_wrapper.set_value("note.dc.subject", ids, "long subject")
+    ids = csv_wrapper.find_by_value_function("dc.subject[en]", detect_long)
+    csv_wrapper.add_column("note.dc.subject[en]")
+    csv_wrapper.set_value("note.dc.subject[en]", ids, "long subject")
 
 # 15. LOM columns:
 ##############################################################

@@ -126,6 +126,13 @@ class CSVWrapper(object):
         """
         for column in self.csv_dict.keys():
             self.apply_value_function(column, fn)
+            
+    def apply_global_cell_function(self, fn):
+        """
+        apply the supplied function to every cell in the whole document
+        """
+        for column in self.csv_dict.keys():
+            self.apply_cell_function(column, fn)
     
     def apply_cell_function(self, column, fn):
         """
