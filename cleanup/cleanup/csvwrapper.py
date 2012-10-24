@@ -263,22 +263,13 @@ class CSVWrapper(object):
         self.delete_column(src)
     
     def _combine(self, src_values, dst_values):
-        src_norm = []
-        map = {}
-        for v in src_values:
-            if v is not None and v != "":
-                src_norm.append(v.lower())
-                map[v.lower()] = v
+        src_norm, map = normalise_strings(src_values)
         
-        dst_norm = []
-        for v in dst_values:
-            if v is not None and v != "":
-                dst_norm.append(v.lower())
-                map[v.lower()] = v
+        dst_norm, dst_map = normalise_strings(dst_values)
+        map.update(dst_map) # merge src_ and dst_ reverse lookup maps
         
         norm_result = dst_norm + [a for a in src_norm if a not in dst_norm]
-        result = [map.get(r) for r in norm_result]
-        return result
+        return denormalise_strings(norm_result, map)
     
     def add_value(self, column, item_id, *values):
         """
@@ -308,14 +299,7 @@ class CSVWrapper(object):
             return
         
         # normalise representation of all values in specified cell
-        cell_norm = []
-        map = {}
-        
-        for v in self.csv_dict[column][item_id]:
-            v_norm = v.strip().lower()
-            
-            cell_norm.append(v_norm)
-            map[v_norm] = v
+        cell_norm, map = normalise_strings(self.csv_dict[column][item_id])
         
         # delete all instances of specified value to be deleted
         cmpval = del_value.strip().lower()
@@ -323,7 +307,7 @@ class CSVWrapper(object):
         
         # put the remaining values back into the cell using their original 
         # representations
-        self.csv_dict[column][item_id] = [map[v] for v in cell_norm]
+        self.csv_dict[column][item_id] = denormalise_strings(cell_norm, map)
         
     def set_value(self, column, item_ids, value):
         """
@@ -361,3 +345,29 @@ class CSVWrapper(object):
         # Set the value of a cell to the specified value(s). The cell to be modified is specified by the column and Jorum item ID. Multiple values are allowed in the form of *args.
         # """
         # pass
+
+def normalise_strings(list_of_str):
+    """
+    Given a list of strings, will return a tuple:
+    
+    (list of normalised strings, map[normalised strings -> original ones])
+    "normalised" means stripped of leading/trailing whitespace and lowercased.
+    """
+    norm = []
+    map = {}
+    for str in list_of_str:
+        norm_str = str.strip().lower()
+        if norm_str:
+            norm.append(norm_str)
+            map[norm_str] = str
+    return (norm, map)
+    
+def denormalise_strings(list_of_str, map):
+    """
+    Given a list of normalised strings and a lookup map, will return the original versions of the strings.
+    
+    "normalised" means stripped of leading/trailing whitespace and lowercased.
+    The map is a dictionary:
+    map['string'] = '  StriNg '
+    """
+    return [map.get(r) for r in list_of_str]

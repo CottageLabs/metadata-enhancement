@@ -37,22 +37,35 @@ def may_be_org(data):
     True if the given string looks like an organisation name (certain keywords). 
     False otherwise.
     """
-    value = data.lower()
+    value = data.strip().lower()
+    if not value:
+    # it's definitely NOT an organisation if it's only whitespace
+        return False
+        
     org_keywords = ['university', 'institution', 'school', 'college']
     for word in org_keywords:
         if word in value:
             return True
     
     return False
-        
+    
 def is_known_org(data):
+    value = data.strip().lower()
+    if not value:
+    # it's definitely NOT a known organisation if it's only whitespace
+        return False
+    
     known_organisations = ['x4l healthier nation', 'leeds metropolitan university', 'cilip', 'the learning bank', 'university of york', 'institution of enterprise', 'open educational repository in support of computer science', 'uclan', 'uclanoer']
     
-    if data.lower() in known_organisations:
+    if value in known_organisations:
         return True
     else:
         return False
         
+def may_be_nonorg(data):
+    could_be_org = may_be_org(data) or is_known_org(data)
+    return not could_be_org
+
 # 1. Advisor columns
 ###########################################################
 
@@ -454,18 +467,7 @@ def rule13a_publisher(csv_wrapper):
 
 # 13.b. auto-detect non-organisations names (e.g. "university", "school", etc) and flag for manual intervention
 def rule13b_publisher(csv_wrapper):
-    def detect_non_org(value):
-        if value == "":
-            return False
-        compare = value.lower()
-        if "university" in compare:
-            return False
-        if "school" in compare:
-            return False
-        if "college" in compare:
-            return False
-        return True
-    ids = csv_wrapper.find_by_value_function("dc.publisher[en]", detect_non_org)
+    ids = csv_wrapper.find_by_value_function("dc.publisher[en]", may_be_nonorg)
     csv_wrapper.add_column("note.dc.publisher[en]")
     csv_wrapper.set_value("note.dc.publisher[en]", ids, "possible person name")
 
@@ -521,12 +523,16 @@ def rule14a_lom(csv_wrapper):
 # 16.b. for all fields with multiple values, de-duplicate repeated values
 # this rule should cover both of these ...
 def rule16a_general(csv_wrapper):
+    from csvwrapper import normalise_strings, denormalise_strings
     def strip_duplicates(values):
+        norm_values, map = normalise_strings(values)
+        
         new_values = []
-        for value in values:
+        for value in norm_values:
             if value not in new_values:
                 new_values.append(value)
-        return new_values
+                
+        return denormalise_strings(new_values, map)
     csv_wrapper.apply_global_cell_function(strip_duplicates)
 
 # 16.c. auto-detect and flag instances of "university", "institution", 
