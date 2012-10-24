@@ -21,7 +21,7 @@ def strip_email(values):
 
 def detect_oddities(value):
     # check for capitalisation - surprisingly tricky
-    capitalised = value.split(" ")[0].istitle()
+    capitalised = value.strip()[0].isupper()
     if not capitalised:
         return True
     # check for surprisingly short strings
