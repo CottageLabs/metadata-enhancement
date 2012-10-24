@@ -69,6 +69,16 @@ data = {
     'dc.identifier.uri': {1 : ["10.1000/182"], 2: [""], 3: ['== fun!'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.identifier.uri[]': {1 : ["UUID"], 2: ["without context"], 3: ['== fun!'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.identifier.uri[en]': {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['this resource is scottish']},
+    
+    'lom.vcard': {1 : ['''BEGIN:vcard
+
+FN:contributor 
+
+ORG:RLO-CETL
+
+EMAIL:c.rainey@londonmet.ac.uk
+
+END:vcard'''], 2: [""], 3: [''], 4: ['BEGIN:vcard FN:Carolyn Hardy ORG:University of Nottingham EMAIL:carolyn.hardy@nottingham.ac.uk END:vcard'], 5: [''], 6: [''], 7: ['']},
     }
 
 wrapper = csvwrapper.CSVWrapper()
@@ -598,3 +608,15 @@ class TestRules(unittest.TestCase):
         
         assert w.csv_dict.has_key('note.dc.subject[en]')
         assert w.csv_dict['note.dc.subject[en]'][7][0] == 'long subject'
+        
+    def test_15a_lom(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule15a_lom(w)
+        
+        assert not w.csv_dict.has_key('lom.vcard')
+        
+        print 'START STR:'+ w.csv_dict['dc.publisher[en]'][1][0] + ':ENDSTR'
+        
+        assert w.csv_dict['dc.publisher[en]'][1][0] == 'RLO-CETL'
+        assert w.csv_dict['dc.publisher[en]'][4][-1] == 'University of Nottingham'

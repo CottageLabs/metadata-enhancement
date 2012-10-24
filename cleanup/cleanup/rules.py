@@ -66,7 +66,7 @@ def rule1b_advisor(csv_wrapper):
     for item_id in item_ids:
         csv_wrapper.delete_record(item_id)
     
-    # 1.b.ii. DiPEX (x1) -> dc.publisher (as DIPEx)
+    # 1.b.ii. DiPEX (x1) -> dc.publisher[en] (as DIPEx)
     item_ids = csv_wrapper.find_in_column(working_on, 'DiPEX')
     for item_id in item_ids:
         csv_wrapper.add_value('dc.publisher[en]', item_id, 'DIPEx')
@@ -512,16 +512,19 @@ def rule14e_general(csv_wrapper):
 # 15. LOM columns:
 ##############################################################
 
-# 15.a. extract any orgs from lom.vcard and place into dc.publisher
+# 15.a. extract any orgs from lom.vcard and place into dc.publisher[en]
 # 15.b. delete lom.vcard
-def rule15a_lom(self):
+def rule15a_lom(csv_wrapper):
     def extract_org(value):
         """ BEGIN:vcard FN:J. Koenig ORG:University of Cambridge END:vcard """
-        start = value.find("ORG:")
+        # norm_value = ''.join(value.splitlines())
+        norm_value = value
+        
+        start = norm_value.find("ORG:")
         if start < 0:
             return None
         
-        afterorg = value[start + 4:]
+        afterorg = norm_value[start + 4:]
         end = afterorg.find(":")
         
         if end < 0:
@@ -532,6 +535,6 @@ def rule15a_lom(self):
         return org
         
     csv_wrapper.apply_value_function('lom.vcard', extract_org)
-    csv_wrapper.merge_columns('lom.vcard', 'dc.publisher')
+    csv_wrapper.merge_columns('lom.vcard', 'dc.publisher[en]')
 
 
