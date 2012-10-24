@@ -628,7 +628,5 @@ class TestRules(unittest.TestCase):
         
         assert not w.csv_dict.has_key('lom.vcard')
         
-        print 'START STR:'+ w.csv_dict['dc.publisher[en]'][1][0] + ':ENDSTR'
-        
         assert w.csv_dict['dc.publisher[en]'][1][0] == 'RLO-CETL'
         assert w.csv_dict['dc.publisher[en]'][4][-1] == 'University of Nottingham'

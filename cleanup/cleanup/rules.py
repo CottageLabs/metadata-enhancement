@@ -20,6 +20,9 @@ def strip_email(values):
     return new_values
 
 def detect_oddities(value):
+    # something definitely wrong with this string if it's just whitespace
+    if not value.strip():
+        return True
     # check for capitalisation - surprisingly tricky
     capitalised = value.strip()[0].isupper()
     if not capitalised:
@@ -517,20 +520,33 @@ def rule14e_general(csv_wrapper):
 def rule15a_lom(csv_wrapper):
     def extract_org(value):
         """ BEGIN:vcard FN:J. Koenig ORG:University of Cambridge END:vcard """
-        # norm_value = ''.join(value.splitlines())
-        norm_value = value
+        norm_value = ' '.join(value.splitlines())
         
-        start = norm_value.find("ORG:")
+        look_for_label = 'ORG:'
+        
+        start = norm_value.find(look_for_label)
+        # in example: start == 25
         if start < 0:
             return None
         
-        afterorg = norm_value[start + 4:]
-        end = afterorg.find(":")
+        afterorg = norm_value[start + len(look_for_label):]
+        # in example: afterorg == 'University of Cambridge END:vcard'
         
-        if end < 0:
+        next_label_end = afterorg.find(":")
+        # in example: next_label_end == 27
+        if next_label_end < 0:
             return None
         
-        org = afterorg[:end - 3].strip()
+        interim = afterorg[:next_label_end]
+        # in example: interim == 'University of Cambridge END'
+        
+        end_of_ORG_value = interim.rfind(' ')
+        # in example: end_of_ORG_value == 23
+        if end_of_ORG_value < 0:
+            return None
+        
+        org = afterorg[:end_of_ORG_value].strip()
+        # in example: org == 'University of Cambridge'
         
         return org
         
