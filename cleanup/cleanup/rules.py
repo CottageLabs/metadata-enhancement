@@ -389,9 +389,9 @@ def rule8c_description(csv_wrapper):
 # 9. Format columns
 ############################################################
 
-# These need to be replaced with the values calculated directly from the DSpace database
-# FIXME: we need the source data first
-# copy(select item2bundle.item_id, bitstreamformatregistry.mimetype from bitstream join bundle2bitstream on bitstream.bitstream_id = bundle2bitstream.bitstream_id join item2bundle on bundle2bitstream.bundle_id = item2bundle.bundle_id join bitstreamformatregistry on bitstream.bitstream_format_id = bitstreamformatregistry.bitstream_format_id) to 'formats.csv' with csv header;
+# 9.a. Merge dc.format[] into dc.format
+def rule9a_format(csv_wrapper):
+    csv_wrapper.merge_columns("dc.format[]", "dc.format")
 
 # 10. Language columns
 #############################################################

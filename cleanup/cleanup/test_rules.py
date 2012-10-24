@@ -69,6 +69,9 @@ data = {
     'dc.identifier.uri': {1 : ["10.1000/182"], 2: [""], 3: ['== fun!'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.identifier.uri[]': {1 : ["UUID"], 2: ["without context"], 3: ['== fun!'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.identifier.uri[en]': {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['this resource is scottish']},
+    
+    'dc.format[]': {1 : ["application/zip"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.format': {1 : [""], 2: ["text/html"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     }
 
 wrapper = csvwrapper.CSVWrapper()
@@ -430,6 +433,15 @@ class TestRules(unittest.TestCase):
         
         assert w.csv_dict['note.dc.description[en]'][3][0] == "possible issue"
         assert w.csv_dict['note.dc.description[en]'][4][0] == "possible issue"
+    
+    def test_9a_format(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule9a_format(w)
+        
+        assert w.csv_dict['dc.format'][1][0] == "application/zip"
+        assert w.csv_dict['dc.format'][2][0] == "text/html"
+        assert not w.csv_dict.has_key('dc.format[]')
     
     def test_10a_language(self):
         w = deepcopy(wrapper)

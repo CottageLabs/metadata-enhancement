@@ -67,19 +67,26 @@ runrules = [
     # advisor
     rules.rule1a_advisor, rules.rule1b_advisor, rules.rule1c_advisor,
     # author
-    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author, rules.rule2d_author, rules.rule2e_author, rules.rule2f_author, rules.rule2g_author, rules.rule2h_author, rules.rule2i_author, 
+    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author, 
+    rules.rule2d_author, rules.rule2e_author, rules.rule2f_author, 
+    rules.rule2g_author, rules.rule2h_author, rules.rule2i_author, 
     # creator
     rules.rule3a_creator, rules.rule3b_creator, rules.rule3c_creator, 
     # contributor
-    rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor, rules.rule4d_contributor, 
+    rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor, 
+    rules.rule4d_contributor, 
     # subject
-    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject, 
+    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, 
+    rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject, 
     # coverage
     rules.rule6a_coverage, rules.rule6b_coverage, 
     # date
-    rules.rule7a_date, rules.rule7b_date, rules.rule7c_date, rules.rule7d_date, rules.rule7e_date, rules.rule7f_date, 
+    rules.rule7a_date, rules.rule7b_date, rules.rule7c_date, 
+    rules.rule7d_date, rules.rule7e_date, rules.rule7f_date, 
     # description
     rules.rule8a_description, rules.rule8b_description, rules.rule8c_description,
+    # format
+    rules.rule9a_format,
     # language
     rules.rule10a_language, rules.rule10b_language, 
     # title
@@ -89,7 +96,8 @@ runrules = [
     # publisher
     rules.rule13a_publisher, rules.rule13b_publisher, 
     # general tidying
-    rules.rule14a_general, rules.rule14c_general, rules.rule14d_general, rules.rule14e_general
+    rules.rule14a_general, rules.rule14c_general, rules.rule14d_general, 
+    rules.rule14e_general
 ]
 
 # load the csv
