@@ -55,7 +55,7 @@ def is_known_org(data):
     # it's definitely NOT a known organisation if it's only whitespace
         return False
     
-    known_organisations = ['x4l healthier nation', 'leeds metropolitan university', 'cilip', 'the learning bank', 'university of york', 'institution of enterprise', 'open educational repository in support of computer science', 'uclan', 'uclanoer']
+    known_organisations = ['x4l healthier nation', 'leeds metropolitan university', 'cilip', 'the learning bank', 'university of york', 'institution of enterprise', 'open educational repository in support of computer science', 'uclan', 'uclanoer', 'phg', 'phgk', 'core-materials', 'dipex', 'learning and skills network ltd']
     
     if value in known_organisations:
         return True

@@ -58,7 +58,8 @@ class CSVWrapper(object):
         # store the list of keys
         self.ids = self.csv_dict[column].keys()
 
-    def save(self, path):
+    def save(self, path, export_cols=None, export_filter_col=None, 
+        export_filter_values=None):
         """
         Save the self.csv_dict as a csv file to the supplied file path
         """
@@ -70,9 +71,14 @@ class CSVWrapper(object):
             header_row = []
             # lets have all the keys in alphabetical order, bringing "id" and "collection"
             # to the front
-            keys = self.csv_dict.keys()
-            keys.sort() 
-            keys = ['id', 'collection'] + [k for k in keys if k != 'id' and k != 'collection']
+            
+            # if export columns (slice) have been specified, stick to that
+            if export_cols:
+                keys = export_cols
+            else:
+                keys = self.csv_dict.keys()
+                keys.sort() 
+                keys = ['id', 'collection'] + [k for k in keys if k != 'id' and k != 'collection']
             
             i = 0
             for header in keys:
@@ -83,10 +89,22 @@ class CSVWrapper(object):
             
             # now, each item id
             for id in self.ids:
-                item_row = [None] * len(self.csv_dict.keys())
+                skip_item = False
+                
+                if export_filter_col and export_filter_values:
+                    for condition in export_filter_values:
+                        if condition not in self.csv_dict[export_filter_col][id]:
+                        # skip the item if we have no interest in it
+                            skip_item = True
+                
+                if skip_item:
+                    continue
+                
+                item_row = [None] * len(keys)
                 for header, i in header_index_map.iteritems():
                     item_row[i] = self._serialise(self.csv_dict[header][id])
                 writer.writerow(item_row)
+                        
     
     def _tokenise(self, cell_value):
         return [v.strip() for v in cell_value.split("||")]
