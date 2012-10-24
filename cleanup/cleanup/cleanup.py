@@ -55,7 +55,7 @@ else: # run all of the rules
     # Implemented a "solution" below. At least they'll run in order now, even 
     # though it's ugly. Format is: rule<rule_no><sub_rule_letter>
     
-    for rule_no in range(1,16): # 1 to 15 (incl. 15)
+    for rule_no in range(1,100):
         for letter in string.ascii_lowercase:
             for a in dir(rules):
                 if a.startswith('rule' + str(rule_no) + letter) and isinstance(rules.__dict__.get(a), types.FunctionType):
@@ -67,37 +67,33 @@ runrules = [
     # advisor
     rules.rule1a_advisor, rules.rule1b_advisor, rules.rule1c_advisor,
     # author
-    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author, 
-    rules.rule2d_author, rules.rule2e_author, rules.rule2f_author, 
-    rules.rule2g_author, rules.rule2h_author, rules.rule2i_author, 
+    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author, rules.rule2d_author, rules.rule2e_author, rules.rule2f_author, rules.rule2g_author, rules.rule2h_author, rules.rule2i_author,
     # creator
-    rules.rule3a_creator, rules.rule3b_creator, rules.rule3c_creator, 
+    rules.rule3a_creator, rules.rule3b_creator, rules.rule3c_creator,
     # contributor
-    rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor, 
-    rules.rule4d_contributor, 
+    rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor, rules.rule4d_contributor, 
     # subject
-    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, 
-    rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject, 
+    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject, 
     # coverage
-    rules.rule6a_coverage, rules.rule6b_coverage, 
+    rules.rule6a_coverage, rules.rule6b_coverage,
     # date
-    rules.rule7a_date, rules.rule7b_date, rules.rule7c_date, 
-    rules.rule7d_date, rules.rule7e_date, rules.rule7f_date, 
+    rules.rule7a_date, rules.rule7b_date, rules.rule7c_date, rules.rule7d_date, rules.rule7e_date, rules.rule7f_date,
     # description
     rules.rule8a_description, rules.rule8b_description, rules.rule8c_description,
     # format
     rules.rule9a_format,
     # language
-    rules.rule10a_language, rules.rule10b_language, 
+    rules.rule10a_language, rules.rule10b_language,
     # title
-    rules.rule11a_title, rules.rule11b_title, 
+    rules.rule11a_title, rules.rule11b_title,
     # identifier
-    rules.rule12a_identifier, 
+    rules.rule12a_identifier,
     # publisher
-    rules.rule13a_publisher, rules.rule13b_publisher, 
+    rules.rule13a_publisher, rules.rule13b_publisher,
+    # LOM
+    rules.rule14a_lom,
     # general tidying
-    rules.rule14a_general, rules.rule14c_general, rules.rule14d_general, 
-    rules.rule14e_general
+    rules.rule16a_general, rules.rule16c_general, rules.rule16d_general, rules.rule16e_general
 ]
 
 # load the csv
