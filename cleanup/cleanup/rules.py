@@ -469,55 +469,12 @@ def rule13b_publisher(csv_wrapper):
     csv_wrapper.add_column("note.dc.publisher[en]")
     csv_wrapper.set_value("note.dc.publisher[en]", ids, "possible person name")
 
-# 14. General tidying
-###########################################################
-
-# 14.a. delete the contents of all fields where the only value in the field is 
-# "||", the multiple value separator
-# 14.b. for all fields with multiple values, de-duplicate repeated values
-# this rule should cover both of these ...
-def rule14a_general(csv_wrapper):
-    def strip_duplicates(values):
-        new_values = []
-        for value in values:
-            if value not in new_values:
-                new_values.append(value)
-        return new_values
-    csv_wrapper.apply_global_cell_function(strip_duplicates)
-
-# 14.c. auto-detect and flag instances of "university", "institution", 
-# "school", "college" etc, and report on the rows where these occur, for possible 
-# manual intervention
-def rule14c_general(csv_wrapper):
-    # dc.contributor.author[en]
-    # dc.subject[en]
-    
-    ids1 = csv_wrapper.find_by_value_function("dc.contributor.author[en]", may_be_org)
-    ids2 = csv_wrapper.find_by_value_function("dc.subject[en]", may_be_org)
-    ids = ids1 + [x for x in ids2 if x not in ids1]
-    csv_wrapper.add_column("note.organisations")
-    csv_wrapper.set_value("note.organisations", ids, "possible org name")
-
-# 14.d. detect and delete all e-mail addresses (have a way to check it's a safe delete first)
-def rule14d_general(csv_wrapper):
-    csv_wrapper.apply_global_cell_function(strip_email)
-
-# 14.e. detect subject keywords which are suspiciously long
-def rule14e_general(csv_wrapper):
-    def detect_long(keyword):
-        if len(keyword) > 30: # that would be a pretty long keyword
-            return True
-        return False
-    ids = csv_wrapper.find_by_value_function("dc.subject[en]", detect_long)
-    csv_wrapper.add_column("note.dc.subject[en]")
-    csv_wrapper.set_value("note.dc.subject[en]", ids, "long subject")
-
-# 15. LOM columns:
+# 14. LOM columns:
 ##############################################################
 
-# 15.a. extract any orgs from lom.vcard and place into dc.publisher[en]
-# 15.b. delete lom.vcard
-def rule15a_lom(csv_wrapper):
+# 14.a. extract any orgs from lom.vcard and place into dc.publisher[en]
+# 14.b. delete lom.vcard
+def rule14a_lom(csv_wrapper):
     def extract_org(value):
         """ BEGIN:vcard FN:J. Koenig ORG:University of Cambridge END:vcard """
         norm_value = ' '.join(value.splitlines())
@@ -552,5 +509,49 @@ def rule15a_lom(csv_wrapper):
         
     csv_wrapper.apply_value_function('lom.vcard', extract_org)
     csv_wrapper.merge_columns('lom.vcard', 'dc.publisher[en]')
+    
+# 15. Merge results of manual work into main dataset
+# TODO pending some results from said manual work!
+    
+# 16. General tidying
+###########################################################
 
+# 16.a. delete the contents of all fields where the only value in the field is 
+# "||", the multiple value separator
+# 16.b. for all fields with multiple values, de-duplicate repeated values
+# this rule should cover both of these ...
+def rule16a_general(csv_wrapper):
+    def strip_duplicates(values):
+        new_values = []
+        for value in values:
+            if value not in new_values:
+                new_values.append(value)
+        return new_values
+    csv_wrapper.apply_global_cell_function(strip_duplicates)
 
+# 16.c. auto-detect and flag instances of "university", "institution", 
+# "school", "college" etc, and report on the rows where these occur, for possible 
+# manual intervention
+def rule16c_general(csv_wrapper):
+    # dc.contributor.author[en]
+    # dc.subject[en]
+    
+    ids1 = csv_wrapper.find_by_value_function("dc.contributor.author[en]", may_be_org)
+    ids2 = csv_wrapper.find_by_value_function("dc.subject[en]", may_be_org)
+    ids = ids1 + [x for x in ids2 if x not in ids1]
+    csv_wrapper.add_column("note.organisations")
+    csv_wrapper.set_value("note.organisations", ids, "possible org name")
+
+# 16.d. detect and delete all e-mail addresses (have a way to check it's a safe delete first)
+def rule16d_general(csv_wrapper):
+    csv_wrapper.apply_global_cell_function(strip_email)
+
+# 16.e. detect subject keywords which are suspiciously long
+def rule16e_general(csv_wrapper):
+    def detect_long(keyword):
+        if len(keyword) > 30: # that would be a pretty long keyword
+            return True
+        return False
+    ids = csv_wrapper.find_by_value_function("dc.subject[en]", detect_long)
+    csv_wrapper.add_column("note.dc.subject[en]")
+    csv_wrapper.set_value("note.dc.subject[en]", ids, "long subject")

@@ -584,18 +584,28 @@ class TestRules(unittest.TestCase):
         assert w.csv_dict['note.dc.publisher[en]'][5][0] == 'possible person name'
         assert w.csv_dict['note.dc.publisher[en]'][6][0] == ''
         
-    def test_14a_general(self):
+    def test_14a_lom(self):
         w = deepcopy(wrapper)
         
-        rules.rule14a_general(w)
+        rules.rule14a_lom(w)
+        
+        assert not w.csv_dict.has_key('lom.vcard')
+        
+        assert w.csv_dict['dc.publisher[en]'][1][0] == 'RLO-CETL'
+        assert w.csv_dict['dc.publisher[en]'][4][-1] == 'University of Nottingham'
+        
+    def test_16a_general(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule16a_general(w)
         
         assert len(w.csv_dict['dc.subject[ene]'][7]) == 1
         assert w.csv_dict['dc.subject[ene]'][7][0] == 'dup'
         
-    def test_14c_general(self):
+    def test_16c_general(self):
         w = deepcopy(wrapper)
         
-        rules.rule14c_general(w)
+        rules.rule16c_general(w)
         
         assert w.csv_dict.has_key('note.organisations')
         assert w.csv_dict['note.organisations'][1][0] == 'possible org name'
@@ -603,30 +613,20 @@ class TestRules(unittest.TestCase):
         assert w.csv_dict['note.organisations'][5][0] == 'possible org name'
         assert w.csv_dict['note.organisations'][6][0] == 'possible org name'
         
-    def test_14d_general(self):
+    def test_16d_general(self):
         w = deepcopy(wrapper)
         
-        rules.rule14d_general(w)
+        rules.rule16d_general(w)
         
         assert w.csv_dict['dc.publisher[en-gb]'][7][0] == ''
         assert w.csv_dict['dc.contributor'][1][0] == ''
         assert len(w.csv_dict['dc.subject[en-gb]'][5]) == 1
         assert w.csv_dict['dc.subject[en-gb]'][5][0] == 'normal subject'
         
-    def test_14e_general(self):
+    def test_16e_general(self):
         w = deepcopy(wrapper)
         
-        rules.rule14e_general(w)
+        rules.rule16e_general(w)
         
         assert w.csv_dict.has_key('note.dc.subject[en]')
         assert w.csv_dict['note.dc.subject[en]'][7][0] == 'long subject'
-        
-    def test_15a_lom(self):
-        w = deepcopy(wrapper)
-        
-        rules.rule15a_lom(w)
-        
-        assert not w.csv_dict.has_key('lom.vcard')
-        
-        assert w.csv_dict['dc.publisher[en]'][1][0] == 'RLO-CETL'
-        assert w.csv_dict['dc.publisher[en]'][4][-1] == 'University of Nottingham'
