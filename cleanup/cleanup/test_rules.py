@@ -10,7 +10,7 @@ data = {
     'dc.contributor.author[]' : {1 : ["author1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author' : {1 : [""], 2: [""], 3: ['author3'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[x-none]' : {1 : [""], 2: ["author2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    'dc.contributor.author[en]' : {1 : ["University of Here"], 2: ["College of Hard Knocks"], 3: [''], 4: ['contributor'], 5: ['Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard'], 6: ['uclanoer'], 7: ['uclan']},
+    'dc.contributor.author[en]' : {1 : ["University of Here"], 2: ["College of Hard Knocks"], 3: ['Arthas Menethril; Undead Scourge'], 4: ['contributor'], 5: ['Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard'], 6: ['uclanoer'], 7: ['uclan']},
     'dc.contributor.author[English]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[en-gb]' : {1 : ["publisher1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     
@@ -172,6 +172,17 @@ class TestRules(unittest.TestCase):
         
         assert "publisher1" in w.csv_dict['dc.publisher[en]'][1]
         assert not w.csv_dict.has_key('dc.contributor.author[en-gb]')
+    
+    def test_2f_author(self):
+        w = deepcopy(wrapper)
+        
+        author_3_len = len(w.csv_dict['dc.contributor.author[en]'][3])
+        
+        rules.rule2f_author(w)
+        
+        assert len(w.csv_dict['dc.contributor.author[en]'][3]) == author_3_len + 1
+        assert "Arthas Menethril" in w.csv_dict['dc.contributor.author[en]'][3]
+        assert "Undead Scourge" in w.csv_dict['dc.contributor.author[en]'][3]
     
     def test_2g_author(self):
         w = deepcopy(wrapper)

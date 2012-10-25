@@ -6,6 +6,15 @@ metadata cleanup tasks
 # Functions shared between different rules
 ###########################################################
 
+def split_by_semicolon(values):
+        new_values = []
+        for value in values:
+            results = value.split(';')
+            # strip preceding/trailing whitespace and empty elements after the split
+            results = clean_list(results)
+            new_values += results
+        return new_values
+
 def clean_list(list):
     # strip whitespace off both ends and remove empty elements from the list
     return [clean_item for clean_item in [item.strip() for item in list] if clean_item]
@@ -135,6 +144,10 @@ def rule2d_author(csv_wrapper):
 def rule2e_author(csv_wrapper):
     csv_wrapper.merge_columns('dc.contributor.author[en-gb]', 'dc.publisher[en]')
 
+# 2.f. split dc.contributor.author[en] values by semicolon
+def rule2f_author(csv_wrapper):
+    csv_wrapper.apply_cell_function('dc.contributor.author[en]', split_by_semicolon)
+    
 # 2.g. if value == 'contributor', delete it (only Author columns)
 # dc.contributor.author[en] should be the only Author column left at this point
 def rule2g_author(csv_wrapper):
@@ -190,15 +203,6 @@ def rule3a_creator(csv_wrapper):
         
 # 3.b. split names separated by ";" into separate values
 def rule3b_creator(csv_wrapper):
-    def split_by_semicolon(values):
-        new_values = []
-        for value in values:
-            results = value.split(';')
-            # strip preceding/trailing whitespace and empty elements after the split
-            results = [clean_item.strip() for clean_item in results if clean_item]
-            new_values += results
-        return new_values
-        
     csv_wrapper.apply_cell_function('dc.creator', split_by_semicolon)
     
 # 3.c. merge dc.creator into dc.contributor.author[en], effectively 
