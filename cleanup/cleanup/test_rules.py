@@ -173,24 +173,24 @@ class TestRules(unittest.TestCase):
         assert "publisher1" in w.csv_dict['dc.publisher[en]'][1]
         assert not w.csv_dict.has_key('dc.contributor.author[en-gb]')
     
-    def test_2f_author(self):
-        w = deepcopy(wrapper)
-        
-        rules.rule2f_author(w)
-        
-        assert len(w.csv_dict['dc.contributor.author[en]'][4]) == 0
-     
     def test_2g_author(self):
         w = deepcopy(wrapper)
         
         rules.rule2g_author(w)
         
-        assert w.csv_dict['dc.contributor.author[en]'][5][0] == "Mark Foss"
-    
+        assert len(w.csv_dict['dc.contributor.author[en]'][4]) == 0
+     
     def test_2h_author(self):
         w = deepcopy(wrapper)
         
         rules.rule2h_author(w)
+        
+        assert w.csv_dict['dc.contributor.author[en]'][5][0] == "Mark Foss"
+    
+    def test_2i_author(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule2i_author(w)
         
         assert w.csv_dict['dc.publisher[en]'][1][0] == "University of Here"
         assert w.csv_dict['dc.contributor.author[en]'][1][0] == "University of Here"
@@ -198,10 +198,10 @@ class TestRules(unittest.TestCase):
         assert w.csv_dict['dc.publisher[en]'][2][0] == "College of Hard Knocks"
         assert w.csv_dict['dc.contributor.author[en]'][2][0] == "College of Hard Knocks"
     
-    def test_2i_author(self):
+    def test_2j_author(self):
         w = deepcopy(wrapper)
         
-        rules.rule2i_author(w)
+        rules.rule2j_author(w)
         
         assert w.csv_dict['dc.contributor.author[en]'][6][0] == ""
         assert w.csv_dict['dc.contributor.author[en]'][7][0] == ""
