@@ -61,22 +61,6 @@ def is_known_org(data):
 def may_be_nonorg(data):
     could_be_org = may_be_org(data) or is_known_org(data)
     return not could_be_org
-
-# Functions which USED to be shared by different rules but are no longer in use
-###########################################################
-
-def detect_oddities(value):
-    # something definitely wrong with this string if it's just whitespace
-    if not value.strip():
-        return True
-    # check for capitalisation - surprisingly tricky
-    capitalised = value.strip()[0].isupper()
-    if not capitalised:
-        return True
-    # check for surprisingly short strings
-    if len(value) < 5:
-        return True
-    return False
     
 # 1. Advisor columns
 ###########################################################
