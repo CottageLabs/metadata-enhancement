@@ -93,7 +93,7 @@ runrules = [
     # LOM
     rules.rule14a_lom,
     # general tidying
-    rules.rule16a_general, rules.rule16c_general, rules.rule16d_general, rules.rule16e_general
+    rules.rule16a_general, rules.rule16c_general, rules.rule16d_general
 ]
 
 # load the csv

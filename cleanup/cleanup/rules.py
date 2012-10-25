@@ -545,13 +545,3 @@ def rule16c_general(csv_wrapper):
 # 16.d. detect and delete all e-mail addresses (have a way to check it's a safe delete first)
 def rule16d_general(csv_wrapper):
     csv_wrapper.apply_global_cell_function(strip_email)
-
-# 16.e. detect subject keywords which are suspiciously long
-def rule16e_general(csv_wrapper):
-    def detect_long(keyword):
-        if len(keyword) > 30: # that would be a pretty long keyword
-            return True
-        return False
-    ids = csv_wrapper.find_by_value_function("dc.subject[en]", detect_long)
-    csv_wrapper.add_column("note.dc.subject[en]")
-    csv_wrapper.set_value("note.dc.subject[en]", ids, "long subject")

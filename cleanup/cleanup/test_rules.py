@@ -610,11 +610,3 @@ class TestRules(unittest.TestCase):
         assert w.csv_dict['dc.contributor'][1][0] == ''
         assert len(w.csv_dict['dc.subject[en-gb]'][5]) == 1
         assert w.csv_dict['dc.subject[en-gb]'][5][0] == 'normal subject'
-        
-    def test_16e_general(self):
-        w = deepcopy(wrapper)
-        
-        rules.rule16e_general(w)
-        
-        assert w.csv_dict.has_key('note.dc.subject[en]')
-        assert w.csv_dict['note.dc.subject[en]'][7][0] == 'long subject'
