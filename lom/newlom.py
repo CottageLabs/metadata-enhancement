@@ -16,7 +16,7 @@ xpaths = {
     'lom.educational.learningresourcetype' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:learningresourcetype/imsd:value/imsd:langstring',
     'lom.educational.intendedenduserrole' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:intendedenduserrole/imsd:value/imsd:langstring',
     'lom.educational.context' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:context/imsd:value/imsd:langstring',
-    'lom.educationa.typicallearningtime' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:typicallearningtime/imsd:datetime',
+    'lom.educational.typicallearningtime' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:typicallearningtime/imsd:datetime',
     'lom.educational.description' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:description/imsd:langstring',
 #    'educational.language' : '/top:manifest/top:metadata/imsd:lom/imsd:educational/imsd:language',
 #    'relation' : '/top:manifest/top:metadata/imsd:lom/imsd:relation/imsd:resource/imsd:description/imsd:langstring',
