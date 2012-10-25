@@ -160,7 +160,7 @@ def rule2h_author(csv_wrapper):
     csv_wrapper.apply_value_function('dc.contributor.author[en]', replace_vcard)
     
 # 2.i. Copy all organisation names to dc.publisher[en] where possible.
-def rule2h_author(csv_wrapper):
+def rule2i_author(csv_wrapper):
     src = 'dc.contributor.author[en]'
     dst = 'dc.publisher[en]'
     
