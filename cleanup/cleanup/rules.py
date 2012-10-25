@@ -28,19 +28,6 @@ def strip_email(values):
             new_values.append(value)
     return new_values
 
-def detect_oddities(value):
-    # something definitely wrong with this string if it's just whitespace
-    if not value.strip():
-        return True
-    # check for capitalisation - surprisingly tricky
-    capitalised = value.strip()[0].isupper()
-    if not capitalised:
-        return True
-    # check for surprisingly short strings
-    if len(value) < 5:
-        return True
-    return False
-    
 def may_be_org(data):
     """
     True if the given string looks like an organisation name (certain keywords). 
@@ -75,6 +62,22 @@ def may_be_nonorg(data):
     could_be_org = may_be_org(data) or is_known_org(data)
     return not could_be_org
 
+# Functions which USED to be shared by different rules but are no longer in use
+###########################################################
+
+def detect_oddities(value):
+    # something definitely wrong with this string if it's just whitespace
+    if not value.strip():
+        return True
+    # check for capitalisation - surprisingly tricky
+    capitalised = value.strip()[0].isupper()
+    if not capitalised:
+        return True
+    # check for surprisingly short strings
+    if len(value) < 5:
+        return True
+    return False
+    
 # 1. Advisor columns
 ###########################################################
 
@@ -400,12 +403,6 @@ def rule8b_description(csv_wrapper):
     csv_wrapper.merge_columns("dc.description[]", "dc.description[en]")
     csv_wrapper.merge_columns("dc.description[en-gb]", "dc.description[en]")
 
-# 8.c. Validate content (check for short strings, starting with capital letters, etc)
-def rule8c_description(csv_wrapper):
-    ids = csv_wrapper.find_by_value_function("dc.description[en]", detect_oddities)
-    csv_wrapper.add_column("note.dc.description[en]")
-    csv_wrapper.set_value("note.dc.description[en]", ids, "possible issue")
-
 # 9. Format columns
 ############################################################
 
@@ -445,13 +442,6 @@ def rule11a_title(csv_wrapper):
     csv_wrapper.merge_columns("dc.title[]", "dc.title[en]")
     csv_wrapper.merge_columns("dc.title[en-US]", "dc.title[en]")
     csv_wrapper.merge_columns("dc.title[en-gb]", "dc.title[en]")
-
-# 11.b. Validate content (check for short strings, starting with capital letters, etc)
-def rule11b_title(csv_wrapper):
-    ids = csv_wrapper.find_by_value_function("dc.title[en]", detect_oddities)
-    csv_wrapper.add_column("note.dc.title[en]")
-    csv_wrapper.set_value("note.dc.title[en]", ids, "possible issue")
-    
     
 # 12. Identifier columns:
 ############################################################

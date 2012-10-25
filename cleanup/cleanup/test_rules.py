@@ -447,14 +447,6 @@ class TestRules(unittest.TestCase):
         assert w.csv_dict['dc.description[en]'][2][0] == "desc2"
         assert not w.csv_dict.has_key('dc.description[en-gb]')
     
-    def test_8c_description(self):
-        w = deepcopy(wrapper)
-        
-        rules.rule8c_description(w)
-        
-        assert w.csv_dict['note.dc.description[en]'][3][0] == "possible issue"
-        assert w.csv_dict['note.dc.description[en]'][4][0] == "possible issue"
-    
     def test_9a_format(self):
         w = deepcopy(wrapper)
         
@@ -530,22 +522,7 @@ class TestRules(unittest.TestCase):
         assert w.csv_dict['dc.title[en]'][5][0] == 'Pimp'
         assert w.csv_dict['dc.title[en]'][6][0] == 'Chwech'
         assert w.csv_dict['dc.title[en]'][7][0] == 'saith'
-        
-    def test_11b_title(self):
-        w = deepcopy(wrapper)
-        
-        rules.rule11b_title(w)
-        
-        assert w.csv_dict.has_key('note.dc.title[en]')
-        
-        assert w.csv_dict['note.dc.title[en]'][1][0] == 'possible issue'
-        assert w.csv_dict['note.dc.title[en]'][2][0] == 'possible issue'
-        assert w.csv_dict['note.dc.title[en]'][3][0] == 'possible issue'
-        assert w.csv_dict['note.dc.title[en]'][4][0] == 'possible issue'
-        assert w.csv_dict['note.dc.title[en]'][5][0] == 'possible issue'
-        assert w.csv_dict['note.dc.title[en]'][6][0] == ''
-        assert w.csv_dict['note.dc.title[en]'][7][0] == 'possible issue'
-        
+                
     def test_12a_identifier(self):
         w = deepcopy(wrapper)
         

@@ -79,13 +79,13 @@ runrules = [
     # date
     rules.rule7a_date, rules.rule7b_date, rules.rule7c_date, rules.rule7d_date, rules.rule7e_date, rules.rule7f_date,
     # description
-    rules.rule8a_description, rules.rule8b_description, rules.rule8c_description,
+    rules.rule8a_description, rules.rule8b_description,
     # format
     rules.rule9a_format,
     # language
     rules.rule10a_language, rules.rule10b_language,
     # title
-    rules.rule11a_title, rules.rule11b_title,
+    rules.rule11a_title,
     # identifier
     rules.rule12a_identifier,
     # publisher

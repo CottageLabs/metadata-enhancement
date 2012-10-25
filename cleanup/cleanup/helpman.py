@@ -22,26 +22,20 @@ else:
     exit()
     
 interesting_cols = {
-    'note.dc.description[en]': ['id', 'dc.description[en]'],
     'note.dc.publisher[en]': ['id', 'dc.publisher[en]', 'dc.contributor.author[en]'],
     'note.dc.subject[en]': ['id', 'dc.subject[en]'],
-    'note.dc.title[en]': ['id', 'dc.title[en]'],
     'note.organisations': ['id', 'dc.contributor.author[en]', 'dc.subject[en]', 'dc.publisher[en]']
 }
 
 look_for = {
-    'note.dc.description[en]': ['possible issue'],
     'note.dc.publisher[en]': ['possible person name'],
     'note.dc.subject[en]': ['long subject'],
-    'note.dc.title[en]': ['possible issue'],
     'note.organisations': ['possible org name']
 }
 
 filenames = {
-    'note.dc.description[en]': 'problems-description.csv',
     'note.dc.publisher[en]': 'problems-publisher.csv',
     'note.dc.subject[en]': 'problems-subject.csv',
-    'note.dc.title[en]': 'problems-title.csv',
     'note.organisations': 'problems-organisations.csv'
 }
 
