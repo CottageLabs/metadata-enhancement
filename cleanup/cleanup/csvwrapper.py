@@ -350,20 +350,6 @@ class CSVWrapper(object):
             new = self._combine(v, existing)
             self.csv_dict[column_name][id] = new
 
-    # Deprecated method templates below - if found to be required, move above 
-    # this line and uncomment.
-    # def get_contents(self, column, item_id):
-        # """
-        # Get the contents of a cell identified by the column and Jorum item ID.
-        # """
-        # pass
-    
-    #def set_contents(self, column, item_id, *values):
-        # """
-        # Set the value of a cell to the specified value(s). The cell to be modified is specified by the column and Jorum item ID. Multiple values are allowed in the form of *args.
-        # """
-        # pass
-
 def normalise_strings(list_of_str):
     """
     Given a list of strings, will return a tuple:
