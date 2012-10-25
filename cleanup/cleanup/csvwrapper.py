@@ -58,7 +58,8 @@ class CSVWrapper(object):
         # store the list of keys
         self.ids = self.csv_dict[column].keys()
 
-    def save(self, path):
+    def save(self, path, export_cols=None, export_filter_col=None, 
+        export_filter_values=None):
         """
         Save the self.csv_dict as a csv file to the supplied file path
         """
@@ -70,9 +71,14 @@ class CSVWrapper(object):
             header_row = []
             # lets have all the keys in alphabetical order, bringing "id" and "collection"
             # to the front
-            keys = self.csv_dict.keys()
-            keys.sort() 
-            keys = ['id', 'collection'] + [k for k in keys if k != 'id' and k != 'collection']
+            
+            # if export columns (slice) have been specified, stick to that
+            if export_cols:
+                keys = export_cols
+            else:
+                keys = self.csv_dict.keys()
+                keys.sort() 
+                keys = ['id', 'collection'] + [k for k in keys if k != 'id' and k != 'collection']
             
             i = 0
             for header in keys:
@@ -83,10 +89,22 @@ class CSVWrapper(object):
             
             # now, each item id
             for id in self.ids:
-                item_row = [None] * len(self.csv_dict.keys())
+                skip_item = False
+                
+                if export_filter_col and export_filter_values:
+                    for condition in export_filter_values:
+                        if condition not in self.csv_dict[export_filter_col][id]:
+                        # skip the item if we have no interest in it
+                            skip_item = True
+                
+                if skip_item:
+                    continue
+                
+                item_row = [None] * len(keys)
                 for header, i in header_index_map.iteritems():
                     item_row[i] = self._serialise(self.csv_dict[header][id])
                 writer.writerow(item_row)
+                        
     
     def _tokenise(self, cell_value):
         return [v.strip() for v in cell_value.split("||")]
@@ -263,22 +281,13 @@ class CSVWrapper(object):
         self.delete_column(src)
     
     def _combine(self, src_values, dst_values):
-        src_norm = []
-        map = {}
-        for v in src_values:
-            if v is not None and v != "":
-                src_norm.append(v.lower())
-                map[v.lower()] = v
+        src_norm, map = normalise_strings(src_values)
         
-        dst_norm = []
-        for v in dst_values:
-            if v is not None and v != "":
-                dst_norm.append(v.lower())
-                map[v.lower()] = v
+        dst_norm, dst_map = normalise_strings(dst_values)
+        map.update(dst_map) # merge src_ and dst_ reverse lookup maps
         
         norm_result = dst_norm + [a for a in src_norm if a not in dst_norm]
-        result = [map.get(r) for r in norm_result]
-        return result
+        return denormalise_strings(norm_result, map)
     
     def add_value(self, column, item_id, *values):
         """
@@ -308,14 +317,7 @@ class CSVWrapper(object):
             return
         
         # normalise representation of all values in specified cell
-        cell_norm = []
-        map = {}
-        
-        for v in self.csv_dict[column][item_id]:
-            v_norm = v.strip().lower()
-            
-            cell_norm.append(v_norm)
-            map[v_norm] = v
+        cell_norm, map = normalise_strings(self.csv_dict[column][item_id])
         
         # delete all instances of specified value to be deleted
         cmpval = del_value.strip().lower()
@@ -323,7 +325,7 @@ class CSVWrapper(object):
         
         # put the remaining values back into the cell using their original 
         # representations
-        self.csv_dict[column][item_id] = [map[v] for v in cell_norm]
+        self.csv_dict[column][item_id] = denormalise_strings(cell_norm, map)
         
     def set_value(self, column, item_ids, value):
         """
@@ -361,3 +363,29 @@ class CSVWrapper(object):
         # Set the value of a cell to the specified value(s). The cell to be modified is specified by the column and Jorum item ID. Multiple values are allowed in the form of *args.
         # """
         # pass
+
+def normalise_strings(list_of_str):
+    """
+    Given a list of strings, will return a tuple:
+    
+    (list of normalised strings, map[normalised strings -> original ones])
+    "normalised" means stripped of leading/trailing whitespace and lowercased.
+    """
+    norm = []
+    map = {}
+    for str in list_of_str:
+        norm_str = str.strip().lower()
+        if norm_str:
+            norm.append(norm_str)
+            map[norm_str] = str
+    return (norm, map)
+    
+def denormalise_strings(list_of_str, map):
+    """
+    Given a list of normalised strings and a lookup map, will return the original versions of the strings.
+    
+    "normalised" means stripped of leading/trailing whitespace and lowercased.
+    The map is a dictionary:
+    map['string'] = '  StriNg '
+    """
+    return [map.get(r) for r in list_of_str]

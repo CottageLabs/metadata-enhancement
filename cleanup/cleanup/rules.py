@@ -20,6 +20,9 @@ def strip_email(values):
     return new_values
 
 def detect_oddities(value):
+    # something definitely wrong with this string if it's just whitespace
+    if not value.strip():
+        return True
     # check for capitalisation - surprisingly tricky
     capitalised = value.strip()[0].isupper()
     if not capitalised:
@@ -34,22 +37,35 @@ def may_be_org(data):
     True if the given string looks like an organisation name (certain keywords). 
     False otherwise.
     """
-    value = data.lower()
+    value = data.strip().lower()
+    if not value:
+    # it's definitely NOT an organisation if it's only whitespace
+        return False
+        
     org_keywords = ['university', 'institution', 'school', 'college']
     for word in org_keywords:
         if word in value:
             return True
     
     return False
-        
-def is_known_org(data):
-    known_organisations = ['x4l healthier nation', 'leeds metropolitan university', 'cilip', 'the learning bank', 'university of york', 'institution of enterprise', 'open educational repository in support of computer science', 'uclan', 'uclanoer']
     
-    if data.lower() in known_organisations:
+def is_known_org(data):
+    value = data.strip().lower()
+    if not value:
+    # it's definitely NOT a known organisation if it's only whitespace
+        return False
+    
+    known_organisations = ['x4l healthier nation', 'leeds metropolitan university', 'cilip', 'the learning bank', 'university of york', 'institution of enterprise', 'open educational repository in support of computer science', 'uclan', 'uclanoer', 'phg', 'phgk', 'core-materials', 'dipex', 'learning and skills network ltd']
+    
+    if value in known_organisations:
         return True
     else:
         return False
         
+def may_be_nonorg(data):
+    could_be_org = may_be_org(data) or is_known_org(data)
+    return not could_be_org
+
 # 1. Advisor columns
 ###########################################################
 
@@ -451,41 +467,78 @@ def rule13a_publisher(csv_wrapper):
 
 # 13.b. auto-detect non-organisations names (e.g. "university", "school", etc) and flag for manual intervention
 def rule13b_publisher(csv_wrapper):
-    def detect_non_org(value):
-        if value == "":
-            return False
-        compare = value.lower()
-        if "university" in compare:
-            return False
-        if "school" in compare:
-            return False
-        if "college" in compare:
-            return False
-        return True
-    ids = csv_wrapper.find_by_value_function("dc.publisher[en]", detect_non_org)
+    ids = csv_wrapper.find_by_value_function("dc.publisher[en]", may_be_nonorg)
     csv_wrapper.add_column("note.dc.publisher[en]")
     csv_wrapper.set_value("note.dc.publisher[en]", ids, "possible person name")
 
-# 14. General tidying
+# 14. LOM columns:
+##############################################################
+
+# 14.a. extract any orgs from lom.vcard and place into dc.publisher[en]
+# 14.b. delete lom.vcard
+def rule14a_lom(csv_wrapper):
+    def extract_org(value):
+        """ BEGIN:vcard FN:J. Koenig ORG:University of Cambridge END:vcard """
+        norm_value = ' '.join(value.splitlines())
+        
+        look_for_label = 'ORG:'
+        
+        start = norm_value.find(look_for_label)
+        # in example: start == 25
+        if start < 0:
+            return None
+        
+        afterorg = norm_value[start + len(look_for_label):]
+        # in example: afterorg == 'University of Cambridge END:vcard'
+        
+        next_label_end = afterorg.find(":")
+        # in example: next_label_end == 27
+        if next_label_end < 0:
+            return None
+        
+        interim = afterorg[:next_label_end]
+        # in example: interim == 'University of Cambridge END'
+        
+        end_of_ORG_value = interim.rfind(' ')
+        # in example: end_of_ORG_value == 23
+        if end_of_ORG_value < 0:
+            return None
+        
+        org = afterorg[:end_of_ORG_value].strip()
+        # in example: org == 'University of Cambridge'
+        
+        return org
+        
+    csv_wrapper.apply_value_function('lom.vcard', extract_org)
+    csv_wrapper.merge_columns('lom.vcard', 'dc.publisher[en]')
+    
+# 15. Merge results of manual work into main dataset
+# TODO pending some results from said manual work!
+    
+# 16. General tidying
 ###########################################################
 
-# 14.a. delete the contents of all fields where the only value in the field is 
+# 16.a. delete the contents of all fields where the only value in the field is 
 # "||", the multiple value separator
-# 14.b. for all fields with multiple values, de-duplicate repeated values
+# 16.b. for all fields with multiple values, de-duplicate repeated values
 # this rule should cover both of these ...
-def rule14a_general(csv_wrapper):
+def rule16a_general(csv_wrapper):
+    from csvwrapper import normalise_strings, denormalise_strings
     def strip_duplicates(values):
+        norm_values, map = normalise_strings(values)
+        
         new_values = []
-        for value in values:
+        for value in norm_values:
             if value not in new_values:
                 new_values.append(value)
-        return new_values
+                
+        return denormalise_strings(new_values, map)
     csv_wrapper.apply_global_cell_function(strip_duplicates)
 
-# 14.c. auto-detect and flag instances of "university", "institution", 
+# 16.c. auto-detect and flag instances of "university", "institution", 
 # "school", "college" etc, and report on the rows where these occur, for possible 
 # manual intervention
-def rule14c_general(csv_wrapper):
+def rule16c_general(csv_wrapper):
     # dc.contributor.author[en]
     # dc.subject[en]
     
@@ -495,12 +548,12 @@ def rule14c_general(csv_wrapper):
     csv_wrapper.add_column("note.organisations")
     csv_wrapper.set_value("note.organisations", ids, "possible org name")
 
-# 14.d. detect and delete all e-mail addresses (have a way to check it's a safe delete first)
-def rule14d_general(csv_wrapper):
+# 16.d. detect and delete all e-mail addresses (have a way to check it's a safe delete first)
+def rule16d_general(csv_wrapper):
     csv_wrapper.apply_global_cell_function(strip_email)
 
-# 14.e. detect subject keywords which are suspiciously long
-def rule14e_general(csv_wrapper):
+# 16.e. detect subject keywords which are suspiciously long
+def rule16e_general(csv_wrapper):
     def detect_long(keyword):
         if len(keyword) > 30: # that would be a pretty long keyword
             return True
@@ -508,33 +561,3 @@ def rule14e_general(csv_wrapper):
     ids = csv_wrapper.find_by_value_function("dc.subject[en]", detect_long)
     csv_wrapper.add_column("note.dc.subject[en]")
     csv_wrapper.set_value("note.dc.subject[en]", ids, "long subject")
-
-# 15. LOM columns:
-##############################################################
-
-# 15.a. extract any orgs from lom.vcard and place into dc.publisher[en]
-# 15.b. delete lom.vcard
-def rule15a_lom(csv_wrapper):
-    def extract_org(value):
-        """ BEGIN:vcard FN:J. Koenig ORG:University of Cambridge END:vcard """
-        # norm_value = ''.join(value.splitlines())
-        norm_value = value
-        
-        start = norm_value.find("ORG:")
-        if start < 0:
-            return None
-        
-        afterorg = norm_value[start + 4:]
-        end = afterorg.find(":")
-        
-        if end < 0:
-            return None
-        
-        org = afterorg[:end - 3].strip()
-        
-        return org
-        
-    csv_wrapper.apply_value_function('lom.vcard', extract_org)
-    csv_wrapper.merge_columns('lom.vcard', 'dc.publisher[en]')
-
-
