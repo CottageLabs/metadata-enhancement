@@ -1,4 +1,5 @@
 import csvwrapper, sys
+from copy import deepcopy
 
 files = []
 for i in range(1, len(sys.argv)):
@@ -34,7 +35,7 @@ for config in files:
     else:
         print "    pivot is not 'id' so building pivot table ..."
         for id, values in source_pivot.iteritems():
-            target_ids = target.find_in_column(pivot, values[0])
+            target_ids = target.find_in_column(pivot, values[0]) # there is only one value in the source table
             targets[id] = target_ids
         print "    done"
         print
@@ -49,7 +50,12 @@ for config in files:
                 # print "        skipping incoming id " + str(id)
                 if id not in skips: skips.append(id)
             for t in targets.get(id, []):
-                column[t] = d[id]
+                # if there are repeated ids in the target, then this is indicative of multiple
+                # values to be entered into the same column (note that this does not de-duplicate)
+                if column.has_key(t):
+                    column[t] += deepcopy(d[id])
+                else:
+                    column[t] = deepcopy(d[id])
         columns[key] = column
     print "    done"
     print "    (skipped " + str(len(skips)) + " ids)"
