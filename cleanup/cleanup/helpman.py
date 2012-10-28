@@ -22,13 +22,8 @@ else:
     exit()
     
 interesting_cols = {
-    'note.dc.publisher[en]': ['id', 'dc.publisher[en]', 'dc.contributor.author[en]'],
-    'note.organisations': ['id', 'dc.contributor.author[en]', 'dc.subject[en]', 'dc.publisher[en]']
-}
-
-look_for = {
-    'note.dc.publisher[en]': ['possible person name'],
-    'note.organisations': ['possible org name']
+    'note.dc.publisher[en]': ['id', 'dc.publisher[en]', 'dc.contributor.author[en]', 'note.dc.publisher[en]'],
+    'note.organisations': ['id', 'dc.contributor.author[en]', 'dc.subject[en]', 'dc.publisher[en]', 'note.organisations']
 }
 
 filenames = {
@@ -45,11 +40,14 @@ print
 for col in interesting_cols.keys():
     print 'Saving interesting data wrt column', col, 'to', OUTDIR + filenames[col] 
     print 'Slicing off these columns:', ', '.join(interesting_cols[col])
-    c.save(OUTDIR + filenames[col], interesting_cols[col], col, look_for[col])
+    
+    filtered_rows = c.filter_rows(col)
+    
+    c.save(OUTDIR + filenames[col], interesting_cols[col], filtered_rows)
+    
     print '... done'
     print
 
 for col, csv in filenames.items():
     tmp = CSVWrapper(OUTDIR + csv)
-    print 'Number of potential problems in', col, '=', len(tmp.csv_dict['id']), '.',
-    print 'Potential problem means:', ', '.join(look_for[col])
+    print 'Number of items in', col, '=', len(tmp.csv_dict['id']), '.'
