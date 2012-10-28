@@ -3,6 +3,11 @@ A set of rules implemented over the CSVWrapper which manage the
 metadata cleanup tasks
 """
 
+# Data shared between common functions and rules
+known_organisations = ['x4l healthier nation', 'leeds metropolitan university', 'cilip', 'the learning bank', 'university of york', 'institution of enterprise', 'open educational repository in support of computer science', 'uclan', 'uclanoer', 'phg', 'phgk', 'core-materials', 'dipex', 'learning and skills network ltd', 'saylor foundation']
+
+org_keywords = ['university', 'institution', 'school', 'college']
+
 # Functions shared between different rules
 ###########################################################
 
@@ -38,7 +43,6 @@ def may_be_org(data):
     # it's definitely NOT an organisation if it's only whitespace
         return False
         
-    org_keywords = ['university', 'institution', 'school', 'college']
     for word in org_keywords:
         if word in value:
             return True
@@ -51,8 +55,6 @@ def is_known_org(data):
     # it's definitely NOT a known organisation if it's only whitespace
         return False
     
-    known_organisations = ['x4l healthier nation', 'leeds metropolitan university', 'cilip', 'the learning bank', 'university of york', 'institution of enterprise', 'open educational repository in support of computer science', 'uclan', 'uclanoer', 'phg', 'phgk', 'core-materials', 'dipex', 'learning and skills network ltd', 'saylor foundation']
-    
     if value in known_organisations:
         return True
     else:
@@ -61,7 +63,41 @@ def is_known_org(data):
 def may_be_nonorg(data):
     could_be_org = may_be_org(data) or is_known_org(data)
     return not could_be_org
+
+def may_be_org_return_match(data):
+    """
+    Return the given string if the given string looks like an organisation 
+    name (certain keywords). 
+    False otherwise.
+    """
+    value = data.strip().lower()
+    if not value:
+    # it's definitely NOT an organisation if it's only whitespace
+        return False
+        
+    for word in org_keywords:
+        if word in value:
+            return data
     
+    return False
+    
+def is_known_org_return_match(data):
+    value = data.strip().lower()
+    if not value:
+    # it's definitely NOT a known organisation if it's only whitespace
+        return False
+    
+    if value in known_organisations:
+        return data
+    else:
+        return False
+
+def may_be_nonorg_return_match(data):
+    if may_be_org(data) or is_known_org(data):
+        return False # not a non-org
+        
+    return data
+
 # 1. Advisor columns
 ###########################################################
 
@@ -445,9 +481,15 @@ def rule13a_publisher(csv_wrapper):
 
 # 13.b. auto-detect non-organisations names (e.g. "university", "school", etc) and flag for manual intervention
 def rule13b_publisher(csv_wrapper):
-    ids = csv_wrapper.find_by_value_function("dc.publisher[en]", may_be_nonorg)
+    matches = csv_wrapper.find_by_value_function_map('dc.publisher[en]', may_be_nonorg_return_match)
+    
     csv_wrapper.add_column("note.dc.publisher[en]")
-    csv_wrapper.set_value("note.dc.publisher[en]", ids, "possible person name")
+    
+    for id, values in matches.items():
+        for value in values:
+            if not csv_wrapper.cell_contains('dc.contributor.author[en]', id, value):
+                if not csv_wrapper.cell_contains("note.dc.publisher[en]", id, value):
+                    csv_wrapper.add_value("note.dc.publisher[en]", id, value)
 
 # 14. LOM columns:
 ##############################################################
@@ -520,11 +562,20 @@ def rule16c_general(csv_wrapper):
     # dc.contributor.author[en]
     # dc.subject[en]
     
-    ids1 = csv_wrapper.find_by_value_function("dc.contributor.author[en]", may_be_org)
-    ids2 = csv_wrapper.find_by_value_function("dc.subject[en]", may_be_org)
-    ids = ids1 + [x for x in ids2 if x not in ids1]
+    def review_if_not_already_in_target(target, matches):
+        for id, values in matches.items():
+            for value in values:
+                if not csv_wrapper.cell_contains(target, id, value):
+                    if not csv_wrapper.cell_contains("note.organisations", id, value):
+                        csv_wrapper.add_value("note.organisations", id, value)
+
     csv_wrapper.add_column("note.organisations")
-    csv_wrapper.set_value("note.organisations", ids, "possible org name")
+    
+    matches1 = csv_wrapper.find_by_value_function_map("dc.contributor.author[en]", may_be_org_return_match)
+    matches2 = csv_wrapper.find_by_value_function_map("dc.subject[en]", may_be_org_return_match)
+    
+    review_if_not_already_in_target('dc.publisher[en]', matches1)
+    review_if_not_already_in_target('dc.publisher[en]', matches2)
 
 # 16.d. detect and delete all e-mail addresses (have a way to check it's a safe delete first)
 def rule16d_general(csv_wrapper):

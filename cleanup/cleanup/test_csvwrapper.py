@@ -206,3 +206,37 @@ class TestCsvWrapper(unittest.TestCase):
         for column in w.csv_dict.keys():
             for id in w.csv_dict[column].keys():
                 assert w.csv_dict[column][id][-1] == 'ADDEDBYTEST'
+
+    def test_16_filter_rows(self):
+        w = deepcopy(wrapper)
+        
+        filtered_rows = w.filter_rows('dc.source')
+        assert len(filtered_rows) == 2
+        assert 1 in filtered_rows
+        assert 4 in filtered_rows
+        
+    def test_17_cell_contains(self):
+        w = deepcopy(wrapper)
+        
+        assert w.cell_contains('dc.title', 1, 'title1')
+        assert w.cell_contains('dc.title', 3, 'title4')
+        assert w.cell_contains('dc.title', 4, 'title5')
+        assert not w.cell_contains('dc.title', 4, 'copyme')
+        
+    def test_18_find_by_value_function_map(self):
+        w = deepcopy(wrapper)
+        
+        def vf(value):
+            if value == "findme":
+                return value
+            return False
+        
+        matches1 = w.find_by_value_function_map("dc.description", vf)
+        matches2 = w.find_by_value_function_map("dc.title", vf)
+        matches3 = w.find_by_value_function_map("dc.source", vf)
+        
+        assert len(matches1) == 0
+        assert len(matches2) == 1
+        assert len(matches3) == 1
+        assert matches2[4][0] == 'findme'
+        assert matches3[1][0] == 'findme'

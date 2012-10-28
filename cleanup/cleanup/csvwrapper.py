@@ -58,8 +58,7 @@ class CSVWrapper(object):
         # store the list of keys
         self.ids = self.csv_dict[column].keys()
 
-    def save(self, path, export_cols=None, export_filter_col=None, 
-        export_filter_values=None):
+    def save(self, path, save_keys_override=None, save_items_override=None):
         """
         Save the self.csv_dict as a csv file to the supplied file path
         """
@@ -69,14 +68,13 @@ class CSVWrapper(object):
             # first, the headers
             header_index_map = {}
             header_row = []
-            # lets have all the keys in alphabetical order, bringing "id" and "collection"
-            # to the front
             
-            # if export columns (slice) have been specified, stick to that
-            if export_cols:
-                keys = export_cols
+            if save_keys_override:
+                keys = save_keys_override
             else:
                 keys = self.csv_dict.keys()
+                # lets have all the keys in alphabetical order, bringing "id" and 
+                # "collection" to the front
                 keys.sort() 
                 keys = ['id', 'collection'] + [k for k in keys if k != 'id' and k != 'collection']
             
@@ -89,17 +87,11 @@ class CSVWrapper(object):
             
             # now, each item id
             for id in self.ids:
-                skip_item = False
                 
-                if export_filter_col and export_filter_values:
-                    for condition in export_filter_values:
-                        if condition not in self.csv_dict[export_filter_col][id]:
-                        # skip the item if we have no interest in it
-                            skip_item = True
-                
-                if skip_item:
-                    continue
-                
+                if save_items_override:
+                    if id not in save_items_override:
+                        continue
+                                
                 item_row = [None] * len(keys)
                 for header, i in header_index_map.iteritems():
                     item_row[i] = self._serialise(self.csv_dict[header][id])
@@ -180,6 +172,26 @@ class CSVWrapper(object):
             for value in values:
                 if fn(value):
                     found.append(id)
+        return found
+        
+    def find_by_value_function_map(self, column, fn):
+        """
+        Apply the supplied function to every cell in the supplied column, and for
+        every cell where the function returns a value (not False), record the 
+        id and the value, and return a dictionary of all matching values like 
+        this: {id: ["value1", "value2"]}.
+        """
+        if not self.csv_dict.has_key(column):
+            return
+        found = {}
+        found_per_id = []
+        for id in self.ids:
+            values = self.csv_dict[column][id]
+            for value in values:
+                if fn(value):
+                    if id not in found:
+                        found[id] = []
+                    found[id].append(value)
         return found
     
     def c2c_copy_by_value_function(self, src, dst, fn):
@@ -349,7 +361,39 @@ class CSVWrapper(object):
             existing = self.csv_dict[column_name].get(id, [])
             new = self._combine(v, existing)
             self.csv_dict[column_name][id] = new
+            
+    def filter_rows(self, filter_column=None):
 
+        slice_ids = []
+        for id in self.ids:
+            if filter_column:
+                if not self.csv_dict[filter_column][id] \
+                    or (
+                        len(self.csv_dict[filter_column][id]) == 1 \
+                        and not self.csv_dict[filter_column][id][0]
+                       ):
+                # skip the item if we have no interest in it - the filter
+                # column field for this item is empty
+                    continue
+            
+            slice_ids.append(id)
+
+        return slice_ids
+        
+    def cell_contains(self, column, id, searchstr):
+        if not self.csv_dict.has_key(column):
+            return
+        if not self.csv_dict[column].has_key(id):
+            return
+        
+        norm_search = searchstr.strip().lower()
+        norm_target_cell, map = normalise_strings(self.csv_dict[column][id])
+        
+        if norm_search in norm_target_cell:
+            return True
+            
+        return False
+                
 def normalise_strings(list_of_str):
     """
     Given a list of strings, will return a tuple:
