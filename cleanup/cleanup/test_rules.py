@@ -203,11 +203,8 @@ class TestRules(unittest.TestCase):
         
         rules.rule2i_author(w)
         
-        assert w.csv_dict['dc.publisher[en]'][1][0] == "Leeds Metropolitan University"
-        assert w.csv_dict['dc.contributor.author[en]'][1][0] == "Leeds Metropolitan University"
-        
-        assert w.csv_dict['dc.publisher[en]'][2][0] == "University of York"
-        assert w.csv_dict['dc.contributor.author[en]'][2][0] == "University of York"
+        assert w.csv_dict['dc.publisher[en]'][1][-1] == "Leeds Metropolitan University"
+        assert w.csv_dict['dc.publisher[en]'][2][-1] == "University of York"
     
     def test_2j_author(self):
         w = deepcopy(wrapper)
@@ -355,6 +352,13 @@ class TestRules(unittest.TestCase):
         assert "and" in w.csv_dict['dc.subject[en]'][5]
         assert "this" in w.csv_dict['dc.subject[en]'][5]
         assert "and, this" not in w.csv_dict['dc.subject[en]'][5]
+    
+    def test_5g_subject(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule5g_subject(w)
+        
+        assert w.csv_dict['dc.publisher[en]'][2][-1] == "university of york"
     
     def test_6a_coverage(self):
         w = deepcopy(wrapper)

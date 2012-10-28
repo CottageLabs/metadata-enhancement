@@ -231,10 +231,7 @@ def rule2h_author(csv_wrapper):
 # 2.i. Copy all organisation names to dc.publisher[en] where possible.
 # check for known, commonly appearing organisations
 def rule2i_author(csv_wrapper):
-    src = 'dc.contributor.author[en]'
-    dst = 'dc.publisher[en]'
-    
-    csv_wrapper.c2c_apply_value_function(src, dst, is_known_org_return_match)
+    csv_wrapper.c2c_apply_value_function('dc.contributor.author[en]', 'dc.publisher[en]', is_known_org_return_match)
     
 # 2.j. if value == 'uclanoer' || value == 'uclan' -> delete value
 def rule2j_author(csv_wrapper):
@@ -356,6 +353,9 @@ def rule5f_subject(csv_wrapper):
         return new_values
     
     csv_wrapper.apply_cell_function("dc.subject[en]", fix_multival)
+
+def rule5g_subject(csv_wrapper):
+    csv_wrapper.c2c_apply_value_function('dc.subject[en]', 'dc.publisher[en]', is_known_org_return_match)
 
 # 6. Coverage column group
 ###########################################################
