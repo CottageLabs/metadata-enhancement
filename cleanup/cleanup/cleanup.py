@@ -73,7 +73,7 @@ runrules = [
     # contributor
     rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor, rules.rule4d_contributor, 
     # subject
-    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject, rule5g_subject,
+    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject, rules.rule5g_subject,
     # coverage
     rules.rule6a_coverage, rules.rule6b_coverage,
     # date

@@ -598,6 +598,6 @@ def rule16c_general(csv_wrapper):
     review_if_not_already_in_target('dc.publisher[en]', matches1)
     review_if_not_already_in_target('dc.publisher[en]', matches2)
 
-# 16.d. detect and delete all e-mail addresses (have a way to check it's a safe delete first)
+# 16.d. detect and delete all e-mail addresses
 def rule16d_general(csv_wrapper):
     csv_wrapper.apply_global_cell_function(strip_email)
