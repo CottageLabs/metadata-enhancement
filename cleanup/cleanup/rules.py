@@ -98,6 +98,38 @@ def may_be_nonorg_return_match(data):
         
     return data
 
+def normalise_dates(value):
+    from datetime import datetime
+    formats = [
+        "%a, %d %b %Y %H:%M:%S +0100",
+        "%Y-%m-%dT%H:%M:%S.%f",
+        "%Y-%m-%d",
+        "%B %Y",
+        "%d-%m-%Y",
+        "%m-%d-%Y",
+        "%d/%m/%Y",
+        "%m/%d/%Y",
+        "%Y",
+#        "%Y-%m-%dT%H:%M:%SZ%B %Y" # can't parse this format, unfortunately
+    ]
+    parses = []
+    for format in formats:
+        try:
+            dt = datetime.strptime(value, format)
+            parses.append(dt)
+        except ValueError:
+            continue
+    
+    if len(parses) == 0:
+        # we couldn't convert the date, so leave it as is
+        return value
+    if len(parses) == 1:
+        # successfully parsed the date
+        return parses[0].strftime("%Y-%m-%dT%H:%M:%SZ")
+    else:
+        # ambigouos date format, so leave it as is
+        return value
+    
 # 1. Advisor columns
 ###########################################################
 
@@ -343,19 +375,11 @@ def rule6b_coverage(csv_wrapper):
 # 7. Date columns
 ###########################################################
 
-# 7.a. reformat the content of dc.date[] into a timestamp
+# 7.a. reformat the content of dc.date[] and dc.date.created into a timestamp where possible
 def rule7a_date(csv_wrapper):
-    # from form: Tue, 16 Jun 2009 11:34:02 +0100
-    # to form: 2010-11-10T10:09:17Z
-    def date_converter(data):
-        from datetime import datetime
-        try:
-            dt = datetime.strptime(data, "%a, %d %b %Y %H:%M:%S +0100")
-            return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
-        except ValueError:
-            # we couldn't convert the date, so leave it as is
-            return data
-    csv_wrapper.apply_value_function("dc.date[]", date_converter)
+    csv_wrapper.apply_value_function("dc.date", normalise_dates)
+    csv_wrapper.apply_value_function("dc.date[]", normalise_dates)
+    csv_wrapper.apply_value_function("dc.date.created", normalise_dates)
 
 # 7.b. merge dc.date[] into dc.date
 def rule7b_date(csv_wrapper):
