@@ -3,6 +3,7 @@ Wrapper class and utility functions for reading, writing and modifying
 a CSV
 """
 import csv
+from copy import deepcopy
 
 class CSVWrapper(object):
 
@@ -378,8 +379,18 @@ class CSVWrapper(object):
             new = self._combine(v, existing)
             self.csv_dict[column_name][id] = new
             
-    def filter_rows(self, filter_column=None):
+    def subset(self, item_ids):
+        new_dict = {}
+        for key, d in self.csv_dict.iteritems():
+            new_dict[key] = {}
+            for i in item_ids:
+                new_dict[key][i] = deepcopy(d[i])
+        sub = CSVWrapper()
+        sub.csv_dict = new_dict
+        sub.populate_ids()
+        return sub
 
+    def filter_rows(self, filter_column=None):
         slice_ids = []
         for id in self.ids:
             if filter_column:
