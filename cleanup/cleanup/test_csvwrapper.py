@@ -183,7 +183,7 @@ class TestCsvWrapper(unittest.TestCase):
         assert len(w.csv_dict['dc.title'][4]) == orig_title_4_len
         # the last element in the first item in dc.title should have been 
         # copied over from dc.source - findme
-        assert w.csv_dict['dc.title'][1][-1:][0] == 'findme'
+        assert w.csv_dict['dc.title'][1][-1] == 'findme'
         
     def test_14_delete_value(self):
         w = deepcopy(wrapper)
@@ -240,3 +240,18 @@ class TestCsvWrapper(unittest.TestCase):
         assert len(matches3) == 1
         assert matches2[4][0] == 'findme'
         assert matches3[1][0] == 'findme'
+    
+    def test_19_c2c_apply_value_function(self):
+        w = deepcopy(wrapper)
+        
+        def vf(value):
+            if value == "findme":
+                return 'THIS_IN_DESTINATION'
+            return False 
+            
+        w.c2c_apply_value_function('dc.source', 'dc.title', vf)
+        
+        # the last element in the first item in dc.title should have been 
+        # changed, corresponding to the last element of dc.source
+        # containing the string "findme"
+        assert w.csv_dict['dc.title'][1][-1] == 'THIS_IN_DESTINATION'

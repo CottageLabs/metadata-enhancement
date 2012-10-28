@@ -60,6 +60,17 @@ def is_known_org(data):
     else:
         return False
         
+def is_known_org_return_match(data):
+    value = data.strip().lower()
+    if not value:
+    # it's definitely NOT a known organisation if it's only whitespace
+        return False
+    
+    if value in known_organisations:
+        return data
+    else:
+        return False
+        
 def may_be_nonorg(data):
     could_be_org = may_be_org(data) or is_known_org(data)
     return not could_be_org
@@ -81,16 +92,6 @@ def may_be_org_return_match(data):
     
     return False
     
-def is_known_org_return_match(data):
-    value = data.strip().lower()
-    if not value:
-    # it's definitely NOT a known organisation if it's only whitespace
-        return False
-    
-    if value in known_organisations:
-        return data
-    else:
-        return False
 
 def may_be_nonorg_return_match(data):
     if may_be_org(data) or is_known_org(data):
@@ -228,16 +229,12 @@ def rule2h_author(csv_wrapper):
     csv_wrapper.apply_value_function('dc.contributor.author[en]', replace_vcard)
     
 # 2.i. Copy all organisation names to dc.publisher[en] where possible.
+# check for known, commonly appearing organisations
 def rule2i_author(csv_wrapper):
     src = 'dc.contributor.author[en]'
     dst = 'dc.publisher[en]'
     
-    # 2.i.i. pattern match on "university", "institution", "school"
-    csv_wrapper.c2c_copy_by_value_function(src, dst, may_be_org)
-    
-    # 2.i.ii. check for known, commonly appearing organisations
-    csv_wrapper.c2c_copy_by_value_function(src, dst, is_known_org)
-    
+    csv_wrapper.c2c_apply_value_function(src, dst, is_known_org_return_match)
     
 # 2.j. if value == 'uclanoer' || value == 'uclan' -> delete value
 def rule2j_author(csv_wrapper):

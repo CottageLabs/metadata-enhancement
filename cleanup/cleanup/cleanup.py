@@ -67,7 +67,7 @@ runrules = [
     # advisor
     rules.rule1a_advisor, rules.rule1b_advisor, rules.rule1c_advisor,
     # author
-    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author, rules.rule2d_author, rules.rule2e_author, rules.rule2g_author, rules.rule2h_author, rules.rule2i_author, rules.rule2j_author,
+    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author, rules.rule2d_author, rules.rule2e_author, rules.rule2f_author, rules.rule2g_author, rules.rule2h_author, rules.rule2i_author, rules.rule2j_author,
     # creator
     rules.rule3a_creator, rules.rule3b_creator, rules.rule3c_creator,
     # contributor

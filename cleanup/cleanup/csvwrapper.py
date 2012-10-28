@@ -209,6 +209,22 @@ class CSVWrapper(object):
                 if fn(value):
                     self.add_value(dst, id, value)
     
+    def c2c_apply_value_function(self, src, dst, fn):
+        """
+        If the given function returns a non-False value after being applied to
+        the src column, put that value into the dst column.
+        
+        Do not modify dst if the function returns False.
+        """
+        if not self.csv_dict.has_key(src) or not self.csv_dict.has_key(dst):
+            return
+            
+        for id in self.ids:
+            values = self.csv_dict[src][id]
+            for value in values:
+                if fn(value):
+                    self.add_value(dst, id, fn(value))
+    
     def delete_column(self, column):
         """
         Delete a column from the dataset with all its data.

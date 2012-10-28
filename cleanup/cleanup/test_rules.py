@@ -10,7 +10,7 @@ data = {
     'dc.contributor.author[]' : {1 : ["author1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author' : {1 : [""], 2: [""], 3: ['author3'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[x-none]' : {1 : [""], 2: ["author2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    'dc.contributor.author[en]' : {1 : ["University of Here"], 2: ["College of Hard Knocks"], 3: ['Arthas Menethril; Undead Scourge'], 4: ['contributor'], 5: ['Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard', 'Agent Smith', 'Aberystwyth University'], 6: ['uclanoer'], 7: ['uclan']},
+    'dc.contributor.author[en]' : {1 : ["Leeds Metropolitan University"], 2: ["University of York"], 3: ['Arthas Menethril; Undead Scourge'], 4: ['contributor'], 5: ['Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard', 'Agent Smith', 'Aberystwyth University'], 6: ['uclanoer'], 7: ['uclan']},
     'dc.contributor.author[English]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[en-gb]' : {1 : ["publisher1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     
@@ -26,7 +26,7 @@ data = {
     'dc.contributor.other[en]' : {1 : ["other1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor[en]' : {1 : ["SHIELD"], 2: ["Cat's Paws Sanctuary", 'Splott'], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['UCLAN']},
     
-    "dc.subject[en]" : {1 : [" de-normalised  spacing    here "], 2: ['"quoted"', 'unquoted', 'college of hard knocks'], 3: ['Upper Case'], 4: ['split; this'], 5: ['and, this', 'but not this'], 6: ['Fairy College', 'Archmage College'], 7: ['wrong separation, of keywords, evil laughter']},
+    "dc.subject[en]" : {1 : [" de-normalised  spacing    here "], 2: ['"quoted"', 'unquoted', 'university of york'], 3: ['Upper Case'], 4: ['split; this'], 5: ['and, this', 'but not this'], 6: ['Fairy College', 'Archmage College'], 7: ['wrong separation, of keywords, evil laughter']},
     "dc.subject[EN]" : {1 : ["subject1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     "dc.subject[]" : {1 : [""], 2: ["subject2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     "dc.subject[en-gb]" : {1 : ["subject3"], 2: [""], 3: [''], 4: [''], 5: ['another+test_of.emails.heh@sub.domain.tld', 'normal subject'], 6: [''], 7: ['']},
@@ -203,11 +203,11 @@ class TestRules(unittest.TestCase):
         
         rules.rule2i_author(w)
         
-        assert w.csv_dict['dc.publisher[en]'][1][0] == "University of Here"
-        assert w.csv_dict['dc.contributor.author[en]'][1][0] == "University of Here"
+        assert w.csv_dict['dc.publisher[en]'][1][0] == "Leeds Metropolitan University"
+        assert w.csv_dict['dc.contributor.author[en]'][1][0] == "Leeds Metropolitan University"
         
-        assert w.csv_dict['dc.publisher[en]'][2][0] == "College of Hard Knocks"
-        assert w.csv_dict['dc.contributor.author[en]'][2][0] == "College of Hard Knocks"
+        assert w.csv_dict['dc.publisher[en]'][2][0] == "University of York"
+        assert w.csv_dict['dc.contributor.author[en]'][2][0] == "University of York"
     
     def test_2j_author(self):
         w = deepcopy(wrapper)
@@ -597,8 +597,8 @@ class TestRules(unittest.TestCase):
         rules.rule16c_general(w)
         
         assert w.csv_dict.has_key('note.organisations')
-        assert w.csv_dict['note.organisations'][1][0] == 'University of Here'
-        assert w.csv_dict['note.organisations'][2][0] == 'College of Hard Knocks'
+        assert w.csv_dict['note.organisations'][1][0] == 'Leeds Metropolitan University'
+        assert w.csv_dict['note.organisations'][2][0] == 'University of York'
         assert len(w.csv_dict['note.organisations'][2]) == 1
         assert 'Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard' in w.csv_dict['note.organisations'][5]
         assert 'Aberystwyth University' in w.csv_dict['note.organisations'][5]
