@@ -101,8 +101,12 @@ def may_be_nonorg_return_match(data):
 
 def normalise_dates(value):
     from datetime import datetime
+    # 2009-08-21T01:50:21+01:00
+    # 2009-12-02T13:31:56+00:00
+    # Thu, 18 Mar 2010 06:21:19 +0000
     formats = [
         "%a, %d %b %Y %H:%M:%S +0100",
+        "%a, %d %b %Y %H:%M:%S +0000",
         "%Y-%m-%dT%H:%M:%S.%f",
         "%Y-%m-%d",
         "%B %Y",
@@ -111,6 +115,8 @@ def normalise_dates(value):
         "%d/%m/%Y",
         "%m/%d/%Y",
         "%Y",
+        "%Y-%m-%dT%H:%M:%S+01:00",
+        "%Y-%m-%dT%H:%M:%S+00:00",
 #        "%Y-%m-%dT%H:%M:%SZ%B %Y" # can't parse this format, unfortunately
     ]
     parses = []
@@ -122,14 +128,14 @@ def normalise_dates(value):
             continue
     
     if len(parses) == 0:
-        # we couldn't convert the date, so leave it as is
-        return value
+        # we couldn't convert the date, so remove it
+        return None
     if len(parses) == 1:
         # successfully parsed the date
         return parses[0].strftime("%Y-%m-%dT%H:%M:%SZ")
     else:
-        # ambigouos date format, so leave it as is
-        return value
+        # ambigouos date format, so remove it
+        return None
     
 # 1. Advisor columns
 ###########################################################
@@ -390,6 +396,7 @@ def rule7c_date(csv_wrapper):
 # 7.d. merge dc.date.issued[] into to dc.date.issued
 def rule7d_date(csv_wrapper):
     csv_wrapper.merge_columns("dc.date.issued[]", "dc.date.issued")
+    csv_wrapper.apply_value_function("dc.date.issued", normalise_dates)
 
 # 7.e. ensure that all dc.date.* fields have only one value; propose to keep the oldest value, where there is more than one
 def rule7e_date(csv_wrapper):
