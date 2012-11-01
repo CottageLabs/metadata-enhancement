@@ -10,7 +10,7 @@ data = {
     'dc.contributor.author[]' : {1 : ["author1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author' : {1 : [""], 2: [""], 3: ['author3'], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[x-none]' : {1 : [""], 2: ["author2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    'dc.contributor.author[en]' : {1 : ["Leeds Metropolitan University"], 2: ["University of York"], 3: ['Arthas Menethril; Undead Scourge'], 4: ['contributor'], 5: ['Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard', 'Agent Smith', 'Aberystwyth University'], 6: ['uclanoer'], 7: ['uclan']},
+    'dc.contributor.author[en]' : {1 : ["Leeds Metropolitan University"], 2: ["University of York"], 3: ['Arthas Menethril; Undead Scourge'], 4: ['contributor'], 5: ['Mark Foss ORG:University of Nottingham EMAIL:foss@nottingham.ac.uk END:vcard', 'Agent Smith', 'Aberystwyth University', 'M H Jacobs, Interdisciplinary Research Centre in Materials, The University of Birmingham, UK'], 6: ['uclanoer'], 7: ['uclan']},
     'dc.contributor.author[English]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[en-gb]' : {1 : ["publisher1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     
@@ -26,7 +26,7 @@ data = {
     'dc.contributor.other[en]' : {1 : ["other1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor[en]' : {1 : ["SHIELD"], 2: ["Cat's Paws Sanctuary", 'Splott'], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['UCLAN']},
     
-    "dc.subject[en]" : {1 : [" de-normalised  spacing    here "], 2: ['"quoted"', 'unquoted', 'university of york'], 3: ['Upper Case'], 4: ['split; this'], 5: ['and, this', 'but not this'], 6: ['Fairy College', 'Archmage College'], 7: ['wrong separation, of keywords, evil laughter']},
+    "dc.subject[en]" : {1 : [" de-normalised  spacing    here "], 2: ['"quoted"', 'unquoted', 'university of york'], 3: ['Upper Case', 'chemistry, organic, first year, undergraduate, university, revision, workbook, self study, Reading, ukoer,sfsoer;'], 4: ['split; this'], 5: ['and, this', 'but not this'], 6: ['Fairy College', 'Archmage College', 'UniVersity OF manCheSter'], 7: ['wrong separation, of keywords, evil laughter']},
     "dc.subject[EN]" : {1 : ["subject1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     "dc.subject[]" : {1 : [""], 2: ["subject2"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     "dc.subject[en-gb]" : {1 : ["subject3"], 2: [""], 3: [''], 4: [''], 5: ['another+test_of.emails.heh@sub.domain.tld', 'normal subject'], 6: [''], 7: ['']},
@@ -46,7 +46,7 @@ data = {
     
     'dc.date[]': {1 : ["Tue, 16 Jun 2009 11:34:02 +0100"], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.date': {1 : [""], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
-    'dc.date.issued[]': {1 : ["date1"], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    'dc.date.issued[]': {1 : ["date1"], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['24/10/2012']},
     'dc.date.issued': {1 : [""], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.date.created': {1 : [""], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.date.created[en]': {1 : [""], 2: ["2012-01-01T00:00:00Z", "2011-01-01T00:00:00Z"], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
@@ -82,6 +82,10 @@ EMAIL:c.rainey@londonmet.ac.uk
 
 END:vcard'''], 2: [""], 3: [''], 4: ['BEGIN:vcard FN:Carolyn Hardy ORG:University of Nottingham EMAIL:carolyn.hardy@nottingham.ac.uk END:vcard'], 5: [''], 6: [''], 7: ['']},
 
+    'note.dc.publisher[en]': {1 : ["WHO"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['Richard Jones', 'Richard Stallman']},
+    'manual.dc.publisher[en].is_not_person_name': {1 : ["y"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
+    
+    'manual.organisations.add_to_publisher': {1 : ["WHO"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['Elemental Conflux', 'Cottage Labs']},
     }
 
 wrapper = csvwrapper.CSVWrapper()
@@ -202,14 +206,6 @@ class TestRules(unittest.TestCase):
         w = deepcopy(wrapper)
         
         rules.rule2i_author(w)
-        
-        assert w.csv_dict['dc.publisher[en]'][1][-1] == "Leeds Metropolitan University"
-        assert w.csv_dict['dc.publisher[en]'][2][-1] == "University of York"
-    
-    def test_2j_author(self):
-        w = deepcopy(wrapper)
-        
-        rules.rule2j_author(w)
         
         assert w.csv_dict['dc.contributor.author[en]'][6][0] == ""
         assert w.csv_dict['dc.contributor.author[en]'][7][0] == ""
@@ -346,19 +342,13 @@ class TestRules(unittest.TestCase):
         
         rules.rule5f_subject(w)
         
+        assert len(w.csv_dict["dc.subject[en]"][3]) == 12
         assert "split" in w.csv_dict['dc.subject[en]'][4]
         assert "this" in w.csv_dict['dc.subject[en]'][4], w.csv_dict['dc.subject[en]']
         assert "split; this" not in w.csv_dict['dc.subject[en]'][4]
         assert "and" in w.csv_dict['dc.subject[en]'][5]
         assert "this" in w.csv_dict['dc.subject[en]'][5]
         assert "and, this" not in w.csv_dict['dc.subject[en]'][5]
-    
-    def test_5g_subject(self):
-        w = deepcopy(wrapper)
-        
-        rules.rule5g_subject(w)
-        
-        assert w.csv_dict['dc.publisher[en]'][2][-1] == "university of york"
     
     def test_6a_coverage(self):
         w = deepcopy(wrapper)
@@ -399,8 +389,10 @@ class TestRules(unittest.TestCase):
         
         rules.rule7d_date(w)
         
-        assert w.csv_dict['dc.date.issued'][1][0] == "date1"
         assert not w.csv_dict.has_key('dc.date.issued[]')
+
+        assert w.csv_dict['dc.date.issued'][7][-1] == "2012-10-24T00:00:00Z"
+        
     
     def test_7e_date(self):
         w = deepcopy(wrapper)
@@ -567,9 +559,13 @@ class TestRules(unittest.TestCase):
     def test_13b_publisher(self):
         w = deepcopy(wrapper)
         
+        w.delete_column('note.dc.publisher[en]')
+        w.delete_column("manual.dc.publisher[en].is_not_person_name")
+        
         rules.rule13b_publisher(w)
         
         assert w.csv_dict.has_key('note.dc.publisher[en]')
+        assert w.csv_dict.has_key("manual.dc.publisher[en].is_not_person_name")
 
         assert w.csv_dict['note.dc.publisher[en]'][3][0] == ''
         assert w.csv_dict['note.dc.publisher[en]'][4][0] == ''
@@ -586,21 +582,65 @@ class TestRules(unittest.TestCase):
         
         assert w.csv_dict['dc.publisher[en]'][1][0] == 'RLO-CETL'
         assert w.csv_dict['dc.publisher[en]'][4][-1] == 'University of Nottingham'
+
+    def test_15a_mergemanual(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule15a_mergemanual(w)
+        
+        assert "WHO" not in w.csv_dict['dc.contributor.author[en]'][1]
+        assert 'Richard Jones', 'Richard Stallman' in w.csv_dict['dc.contributor.author[en]'][7]
+        
+    def test_15b_mergemanual(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule15b_mergemanual(w)
+        
+        assert "WHO" in w.csv_dict['dc.publisher[en]'][1]
+        assert 'Elemental Conflux', 'Cottage Labs' in w.csv_dict['dc.publisher[en]'][7]
         
     def test_16a_general(self):
         w = deepcopy(wrapper)
         
         rules.rule16a_general(w)
         
-        assert len(w.csv_dict['dc.subject[ene]'][7]) == 1
-        assert w.csv_dict['dc.subject[ene]'][7][0] == 'dup'
+        assert w.csv_dict['dc.publisher[en-gb]'][7][0] == ''
+        assert w.csv_dict['dc.contributor'][1][0] == ''
+        assert len(w.csv_dict['dc.subject[en-gb]'][5]) == 1
+        assert w.csv_dict['dc.subject[en-gb]'][5][0] == 'normal subject'
         
     def test_16c_general(self):
         w = deepcopy(wrapper)
         
         rules.rule16c_general(w)
         
+        assert len(w.csv_dict['dc.subject[ene]'][7]) == 1
+        assert w.csv_dict['dc.subject[ene]'][7][0] == 'dup'
+    
+    def test_16d_general(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule16d_general(w)
+
+        # from dc.contributor.author[en]
+        assert w.csv_dict['dc.publisher[en]'][1][-1] == "Leeds Metropolitan University"
+        assert w.csv_dict['dc.publisher[en]'][2][-1] == "University of York"
+        assert w.csv_dict['dc.publisher[en]'][5][-1] == "University of Birmingham"
+        
+        # from dc.subject[en]
+        assert w.csv_dict['dc.publisher[en]'][6][-1] == 'University of Manchester'
+    
+    def test_16e_general(self):
+        w = deepcopy(wrapper)
+        
+        w.delete_column('note.organisations')
+        w.delete_column('manual.organisations.add_to_publisher')
+        
+        rules.rule16e_general(w)
+        
         assert w.csv_dict.has_key('note.organisations')
+        assert w.csv_dict.has_key('manual.organisations.add_to_publisher')
+        
         assert w.csv_dict['note.organisations'][1][0] == 'Leeds Metropolitan University'
         assert w.csv_dict['note.organisations'][2][0] == 'University of York'
         assert len(w.csv_dict['note.organisations'][2]) == 1
@@ -608,13 +648,19 @@ class TestRules(unittest.TestCase):
         assert 'Aberystwyth University' in w.csv_dict['note.organisations'][5]
         assert 'Archmage College' not in w.csv_dict['note.organisations'][6]
         assert 'Fairy College' in w.csv_dict['note.organisations'][6]
-        
-    def test_16d_general(self):
+
+    def test_16f_general(self):
         w = deepcopy(wrapper)
         
-        rules.rule16d_general(w)
+        rules.rule13b_publisher(w)
+        rules.rule16e_general(w)
         
-        assert w.csv_dict['dc.publisher[en-gb]'][7][0] == ''
-        assert w.csv_dict['dc.contributor'][1][0] == ''
-        assert len(w.csv_dict['dc.subject[en-gb]'][5]) == 1
-        assert w.csv_dict['dc.subject[en-gb]'][5][0] == 'normal subject'
+        # print rules.columns_added_by_cleanup
+        assert len(rules.columns_added_by_cleanup) == 4
+        
+        rules.rule16f_general(w)
+        
+        assert not w.csv_dict.has_key("note.dc.publisher[en]")
+        assert not w.csv_dict.has_key("manual.dc.publisher[en].is_not_person_name")
+        assert not w.csv_dict.has_key("note.organisations")
+        assert not w.csv_dict.has_key('manual.organisations.add_to_publisher')

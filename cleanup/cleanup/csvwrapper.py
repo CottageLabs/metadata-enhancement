@@ -75,10 +75,13 @@ class CSVWrapper(object):
             else:
                 keys = self.csv_dict.keys()
                 # lets have all the keys in alphabetical order, bringing "id" and 
-                # "collection" to the front
-                keys.sort() 
-                keys = ['id', 'collection'] + [k for k in keys if k != 'id' and k != 'collection']
-            
+                # "collection" to the front if they exist
+                keys.sort()
+                if 'id' in keys and 'collection' in keys:
+                    keys = ['id', 'collection'] + [k for k in keys if k != 'id' and k != 'collection']
+                elif 'id' in keys:
+                    keys = ['id'] + [k for k in keys if k != 'id']
+                    
             i = 0
             for header in keys:
                 header_row.append(header)
@@ -225,6 +228,19 @@ class CSVWrapper(object):
             for value in values:
                 if fn(value):
                     self.add_value(dst, id, fn(value))
+                    
+    def c2c_copy_cells(self, src, dst, ids):
+        """
+        Add the contents of certain specified cells from the src column to the dst column
+        """
+        if not self.csv_dict.has_key(src) or not self.csv_dict.has_key(dst):
+            return
+            
+        for id in ids:
+            if not self.csv_dict[src].has_key(id) or not self.csv_dict[dst].has_key(id):
+                return
+                
+            self.add_value(dst, id, *self.csv_dict[src][id])
     
     def delete_column(self, column):
         """
@@ -290,7 +306,7 @@ class CSVWrapper(object):
         Merges two CSV columns. If there are overlapping values, the fields are 
         concatenated (i.e. non-destructive merging - no data is overwritten).
         
-        Takes two column names as its two parameters.
+        Takes two column names as its first two parameters.
             The first column is the one that you want to try to merge with the 
                 second one. The first column will be deleted after a successful 
                 merge.
@@ -390,22 +406,43 @@ class CSVWrapper(object):
         sub.populate_ids()
         return sub
 
-    def filter_rows(self, filter_column=None):
+    def filter_rows(self, filter_column, should_be_empty):
+        """
+        Return a list of item ID-s where the filter column contains or does not contain a value.
+        If should_be_empty is True, then the id is only added to the results if it's filter_column field is empty.
+        If should_be_empty is False, then there must be some content in the id's filter_column field for it to be let through the filter.
+        """
+        if not self.csv_dict.has_key(filter_column):
+            if should_be_empty:
+                return self.ids
+            else:
+                return []
+        
         slice_ids = []
         for id in self.ids:
-            if filter_column:
-                if not self.csv_dict[filter_column][id] \
-                    or (
-                        len(self.csv_dict[filter_column][id]) == 1 \
-                        and not self.csv_dict[filter_column][id][0]
-                       ):
-                # skip the item if we have no interest in it - the filter
-                # column field for this item is empty
-                    continue
+            if (
+                not self.csv_dict[filter_column][id] \
+                or (
+                    len(self.csv_dict[filter_column][id]) == 1 \
+                    and not self.csv_dict[filter_column][id][0]
+                   )
+                ) \
+                ^ should_be_empty:
+            # skip the item if we have no interest in it - the filter
+            # column field for this item is empty
+                continue
             
             slice_ids.append(id)
 
         return slice_ids
+        
+    def filter_columns(self, *keep_columns):
+        """
+        Deletes all columns in the CSV *except* the ones passed in as parameters to this method.
+        """
+        for col in self.csv_dict.keys():
+            if col not in keep_columns:
+                self.delete_column(col)
         
     def cell_contains(self, column, id, searchstr):
         if not self.csv_dict.has_key(column):
