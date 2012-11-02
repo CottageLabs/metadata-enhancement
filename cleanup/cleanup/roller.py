@@ -14,12 +14,12 @@ dc.subject[en]
 100,kayword1
 101,keyword3
 
-Running this script on the result of "flatten" with the "rollup" option will result in the following file:
+Running this script on the result of "flatten" with the "roll" option will result in the following file:
 id,dc.subject[en]
 100,keyword1||keyword2||kayword1
 101,keyword3
 
-So flatten <-> rollup.
+So flatten <-> roll.
 """
 
 import sys, csv
@@ -92,12 +92,22 @@ def main(argv=None):
             exit()
             
     else:
-        print "Usage: python", sys.argv[0], "(flatten|rollup) <pivot_column>,<target_column>:<input_file>.csv <output_filename>.csv"
+        print "Usage: python", sys.argv[0], "(flatten|roll) <pivot_column>,<target_column>:<input_file>.csv <output_filename>.csv"
         print "1. First argument is which operation to perform on the data - flatten or roll up"
         print "2. The second argument has three components. Pivot column is the column which identifies individual records (usually something like 'id'). Target column is the one that you want flattened / rolled up. Finally, the input file is a UNIX-style path to the CSV you want to process."
         print "3. Third argument is a UNIX-style path to an output CSV file"
         exit()
+        
+    if OPERATION not in ['flatten', 'roll']:
+        print 'ERROR: Operation to be performed needs to be either "flatten" or "roll" (no quotes)'
+        exit()
     
+    if OPERATION == 'flatten':
+        print 'FLATTENING'
+        
+    elif OPERATION == 'roll':
+        print 'ROLLING UP'
+        
     print 'Loading', IN,
     
     if OPERATION == 'flatten':

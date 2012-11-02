@@ -384,7 +384,7 @@ class CSVWrapper(object):
                 continue
             self.csv_dict[column][id] = [value]
             
-    def incorporate_column(self, column_name, column):
+    def incorporate_column(self, column_name, column, overwrite=False):
         if not self.csv_dict.has_key(column_name):
             self.csv_dict[column_name] = {}
         for id in self.ids:
@@ -392,7 +392,10 @@ class CSVWrapper(object):
             if id in column.keys():
                 v = column[id]
             existing = self.csv_dict[column_name].get(id, [])
-            new = self._combine(v, existing)
+            if overwrite:
+                new = v
+            else:
+                new = self._combine(v, existing)
             self.csv_dict[column_name][id] = new
             
     def subset(self, item_ids):

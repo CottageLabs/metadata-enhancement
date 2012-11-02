@@ -598,7 +598,7 @@ class TestRules(unittest.TestCase):
         
         assert "WHO" in w.csv_dict['dc.publisher[en]'][1]
         assert 'Elemental Conflux', 'Cottage Labs' in w.csv_dict['dc.publisher[en]'][7]
-        
+
     def test_16a_general(self):
         w = deepcopy(wrapper)
         

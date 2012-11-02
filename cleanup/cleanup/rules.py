@@ -645,7 +645,7 @@ def rule15b_mergemanual(csv_wrapper):
     if csv_wrapper.csv_dict.has_key('manual.organisations.add_to_publisher'):
         merge_ids = csv_wrapper.filter_rows('manual.organisations.add_to_publisher', should_be_empty=False)
         csv_wrapper.c2c_copy_cells('manual.organisations.add_to_publisher', 'dc.publisher[en]', merge_ids)
-    
+            
 # 16. General tidying
 ###########################################################
 

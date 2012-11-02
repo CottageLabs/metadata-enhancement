@@ -18,7 +18,12 @@ target = csvwrapper.CSVWrapper(target_file)
 print "done"
 
 for config in files:
-    pivot, file = config.split(":")
+    config_params = config.split(":")
+    pivot = config_params[0]
+    file = config_params[1]
+    overwrite = False
+    if len(config_params) == 3 and config_params[2] == 'overwrite':
+        overwrite = True
     
     print "Stitching file " + file + " on pivot: " + pivot
     
@@ -65,7 +70,11 @@ for config in files:
         if name == "id" or name == pivot:
             continue
         print "    stitching column " + name
-        target.incorporate_column(name, column)
+        if overwrite:
+            print '    Overwriting existing column contents.'
+            target.incorporate_column(name, column, overwrite=True)
+        else:
+            target.incorporate_column(name, column)
         print "    done"
         print
 
