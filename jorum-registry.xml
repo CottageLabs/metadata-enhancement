@@ -1,0 +1,235 @@
+<?xml version="1.0"?>
+
+<dspace-dc-types>
+
+    <dspace-header>
+        <title>Jorum Metadata Schema</title>
+    </dspace-header>
+
+    <!-- schemas used -->
+
+    <dc-schema>
+        <name>dc</name>
+        <namespace>http://dublincore.org/documents/dcmi-terms/</namespace>
+    </dc-schema>
+
+    <dc-schema>
+        <name>lom</name>
+        <namespace>http://www.imsglobal.org/xsd/imsmd_v1p2</namespace>
+    </dc-schema>
+
+    <!-- metadata elements in the schemas -->
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>audience</element>
+        <scope_note>Audience for the metadata (usually HE or FE)</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>contributor</element>
+        <qualifier>author</qualifier>
+        <scope_note>Author of the work</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>date</element>
+        <scope_note>Date relating to the lifecycle of the work (unspecified relation)</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>date</element>
+        <qualifier>created</qualifier>
+        <scope_note>The date of creation of the work itself</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>date</element>
+        <qualifier>issued</qualifier>
+        <scope_note>Date the work is made available through the repository</scope_note>
+    </dc-type>
+
+    <dc-type>
+        <schema>dc</schema>
+        <element>description</element>
+        <qualifier>sponsorship</qualifier>
+        <scope_note>Sponsor of the work</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>description</element>
+        <scope_note>Description of the resource</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>format</element>
+        <scope_note>Mimetypes of the files associated with the resource</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <scope_note>An identifier associated with the work</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>identifier</element>
+        <qualifier>uri</qualifier>
+        <scope_note>A URI associated with the work</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>language</element>
+        <scope_note>The primary language of the content of the resource</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>publisher</element>
+        <scope_note>Individual, body or organisation responsible for publishing the resource</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <scope_note>The relationship the work has to other works</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>ispartofseries</qualifier>
+        <scope_note>Work is part of the related series</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>isreferencedby</qualifier>
+        <scope_note>The resource is referenced by another resource, as identified here</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>relation</element>
+        <qualifier>uri</qualifier>
+        <scope_note>The URI of a related resource</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>rights</element>
+        <qualifier>uri</qualifier>
+        <scope_note>URI to rights information</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>rights</element>
+        <scope_note>Rights information</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>source</element>
+        <qualifier>uri</qualifier>
+        <scope_note>URI to the source where the resource originated</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>source</element>
+        <scope_note>Information of the source where the resource originated</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>classification</qualifier>
+        <scope_note>Keys from formal subject classifications</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>jacs3</qualifier>
+        <scope_note>JACS3 classification text</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>jacs3code</qualifier>
+        <scope_note>JACS3 classification code</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>ld</qualifier>
+        <scope_note>Learn Direct classification text</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <qualifier>ldcode</qualifier>
+        <scope_note>Learn Direct classification code</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>subject</element>
+        <scope_note>Subject keywords</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>dc</schema>
+        <element>title</element>
+        <scope_note>Title of the work</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>lom</schema>
+        <element>educational</element>
+        <qualifier>typicallearningtime</qualifier>
+        <scope_note>Typical time for learning required by the resource</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>lom</schema>
+        <element>educational</element>
+        <qualifier>context</qualifier>
+        <scope_note>Educational context for the work</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>lom</schema>
+        <element>educational</element>
+        <qualifier>description</qualifier>
+        <scope_note>Educational description</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>lom</schema>
+        <element>educational</element>
+        <qualifier>intendedenduserrole</qualifier>
+        <scope_note>Role of the intended end-user</scope_note>
+    </dc-type>
+    
+    <dc-type>
+        <schema>lom</schema>
+        <element>educational</element>
+        <qualifier>learningresourcetype</qualifier>
+        <scope_note>Learning resource type</scope_note>
+    </dc-type>
+    
+</dspace-dc-types>
