@@ -655,6 +655,9 @@ def rule16a_general(csv_wrapper):
 
 # 16.b. delete the contents of all fields where the only value in the field is 
 # "||", the multiple value separator
+# NOTE: this rule doesn't actually need to be implemented, as the general deduplication
+# task will deal with it
+
 # 16.c. for all fields with multiple values, de-duplicate repeated values
 # this rule should cover both of these ...
 def rule16c_general(csv_wrapper):

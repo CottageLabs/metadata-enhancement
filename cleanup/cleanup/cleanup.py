@@ -72,17 +72,22 @@ runrules = [
     # advisor
     rules.rule1a_advisor, rules.rule1b_advisor, rules.rule1c_advisor,
     # author
-    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author, rules.rule2d_author, rules.rule2e_author, rules.rule2f_author, rules.rule2g_author, rules.rule2h_author, rules.rule2i_author,
+    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author, 
+    rules.rule2d_author, rules.rule2e_author, rules.rule2f_author, 
+    rules.rule2g_author, rules.rule2h_author, rules.rule2i_author,
     # creator
     rules.rule3a_creator, rules.rule3b_creator, rules.rule3c_creator,
     # contributor
-    rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor, rules.rule4d_contributor, 
+    rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor, 
+    rules.rule4d_contributor, 
     # subject
-    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject,
+    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, 
+    rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject,
     # coverage
     rules.rule6a_coverage, rules.rule6b_coverage,
     # date
-    rules.rule7a_date, rules.rule7b_date, rules.rule7c_date, rules.rule7d_date, rules.rule7e_date, rules.rule7f_date,
+    rules.rule7a_date, rules.rule7b_date, rules.rule7c_date, 
+    rules.rule7d_date, rules.rule7e_date, rules.rule7f_date,
     # description
     rules.rule8a_description, rules.rule8b_description,
     # format
@@ -100,7 +105,8 @@ runrules = [
     # Merge results from manual processing
     rules.rule15a_mergemanual, rules.rule15b_mergemanual,
     # general tidying
-    rules.rule16a_general, rules.rule16c_general, rules.rule16d_general, rules.rule16e_general, rules.rule16f_general
+    rules.rule16a_general, rules.rule16c_general, rules.rule16d_general, 
+    rules.rule16e_general, rules.rule16f_general
 ]
 
 draft_only_rules = []

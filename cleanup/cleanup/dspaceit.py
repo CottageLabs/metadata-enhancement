@@ -5,7 +5,7 @@ cleaned_file = sys.argv[2]
 outdir = sys.argv[3]
 
 ROW_COUNT = 500
-CMD = "./dspace metadata-import "
+CMD = "$DSPACE_BIN/dspace metadata-import -f "
 
 print "CONFIG: original DSpace export file: " + original_file
 print "CONFIG: cleaned metadata file (to be imported): " + cleaned_file
@@ -27,7 +27,7 @@ original_columns = original.csv_dict.keys()
 cleaned_columns = cleaned.csv_dict.keys()
 blanks = [c for c in original_columns if c not in cleaned_columns]
 
-import_script = ""
+import_script = 'DSPACE_BIN="/opt/dspace-1.8.2/bin"\n'
 
 start = 0
 end = ROW_COUNT
@@ -46,11 +46,12 @@ while not done:
     for blank in blanks:
         subset.add_column(blank)
     
-    out_file = os.path.join(outdir, "import" + str(count) + ".csv")
+    fn = "import" + str(count) + ".csv"
+    out_file = os.path.join(outdir, fn)
     print "... writing to " + out_file + " ..."
     
     subset.save(out_file)
-    import_script += CMD + out_file + "\n"
+    import_script += CMD + fn + "\n"
     
     count += 1
     start = end

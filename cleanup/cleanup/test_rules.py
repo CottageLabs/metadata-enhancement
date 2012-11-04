@@ -583,6 +583,8 @@ class TestRules(unittest.TestCase):
         assert w.csv_dict['dc.publisher[en]'][1][0] == 'RLO-CETL'
         assert w.csv_dict['dc.publisher[en]'][4][-1] == 'University of Nottingham'
 
+    # NOTE: 14b is rolled into 14a, and 14c is a general rule handled later
+
     def test_15a_mergemanual(self):
         w = deepcopy(wrapper)
         
