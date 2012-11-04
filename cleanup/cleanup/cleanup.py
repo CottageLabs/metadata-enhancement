@@ -118,6 +118,9 @@ csv_wrapper = CSVWrapper(CSV)
 print "done"
 print
 
+if MAKE_RELEASE:
+    runrules = release_only_rules
+
 # run through all the rules, passing in the wrapper each time
 count_run = 0
 for rule in runrules:
