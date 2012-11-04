@@ -10,6 +10,7 @@ import rules
 CSV = None
 OUT = None
 RULE = None
+MAKE_RELEASE = None
 
 # obtain the csv file paths from the command line arguments
 # and optionally the rule we want to run
@@ -25,12 +26,16 @@ if len(sys.argv) > 2:
         print "Please supply a path to a csv file to output to"
         exit()
     
-    RULE = sys.argv[3] if len(sys.argv) > 3 else None
+    MAKE_RELEASE = True if len(sys.argv) > 3 and sys.argv[3] == 'release' else False
+    
+    RULE = sys.argv[4] if len(sys.argv) > 4 else None
+    
 else:
-    print "This script takes 2 or 3 arguments"
-    print "1. path to a CSV file to process (input)"
-    print "2. path to a CSV file to output to"
-    print "3. a single rule name to run"
+    print "This script takes 2 mandatory and 2 optional arguments"
+    print "[NEED] 1. path to a CSV file to process (input)"
+    print "[NEED] 2. path to a CSV file to output to"
+    print "[optional] 3. output version - the word 'release' or 'draft' (w/out the quotes)"
+    print "[optional] 4. a single rule name to run"
     exit()
 
 # give the user some feedback on the run parameters
@@ -67,13 +72,13 @@ runrules = [
     # advisor
     rules.rule1a_advisor, rules.rule1b_advisor, rules.rule1c_advisor,
     # author
-    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author, rules.rule2d_author, rules.rule2e_author, rules.rule2f_author, rules.rule2g_author, rules.rule2h_author, rules.rule2i_author, rules.rule2j_author,
+    rules.rule2a_author, rules.rule2b_author, rules.rule2c_author, rules.rule2d_author, rules.rule2e_author, rules.rule2f_author, rules.rule2g_author, rules.rule2h_author, rules.rule2i_author,
     # creator
     rules.rule3a_creator, rules.rule3b_creator, rules.rule3c_creator,
     # contributor
     rules.rule4a_contributor, rules.rule4b_contributor, rules.rule4c_contributor, rules.rule4d_contributor, 
     # subject
-    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject, rules.rule5g_subject,
+    rules.rule5a_subject, rules.rule5b_subject, rules.rule5c_subject, rules.rule5d_subject, rules.rule5e_subject, rules.rule5f_subject,
     # coverage
     rules.rule6a_coverage, rules.rule6b_coverage,
     # date
@@ -92,9 +97,14 @@ runrules = [
     rules.rule13a_publisher, rules.rule13b_publisher,
     # LOM
     rules.rule14a_lom,
+    # Merge results from manual processing
+    rules.rule15a_mergemanual, rules.rule15b_mergemanual,
     # general tidying
-    rules.rule16a_general, rules.rule16c_general, rules.rule16d_general
+    rules.rule16a_general, rules.rule16c_general, rules.rule16d_general, rules.rule16e_general, rules.rule16f_general
 ]
+
+draft_only_rules = []
+release_only_rules = [rules.rule15a_mergemanual, rules.rule15b_mergemanual, rules.rule16f_general]
 
 # load the csv
 print "Loading csv from " + CSV + " ..."
@@ -105,10 +115,19 @@ print
 # run through all the rules, passing in the wrapper each time
 count_run = 0
 for rule in runrules:
-    print "Executing rule " + rule.__name__ + " ..."
+
+    # skip certain rules based on whether we're making a draft or release version
+    if MAKE_RELEASE:
+        if rule in draft_only_rules:
+            continue
+    else: # we're doing a draft
+        if rule in release_only_rules:
+            continue
+    
+    print "Executing rule " + rule.__name__ + " ...",
     rule(csv_wrapper)
     count_run += 1
-    print "complete"
+    print "done."
 print
 
 print 'Ran', count_run, 'rules'

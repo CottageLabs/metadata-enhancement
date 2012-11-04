@@ -210,12 +210,20 @@ class TestCsvWrapper(unittest.TestCase):
     def test_16_filter_rows(self):
         w = deepcopy(wrapper)
         
-        filtered_rows = w.filter_rows('dc.source')
+        filtered_rows = w.filter_rows('dc.source', should_be_empty=False)
         assert len(filtered_rows) == 2
         assert 1 in filtered_rows
         assert 4 in filtered_rows
         
-    def test_17_cell_contains(self):
+    def test_17_filter_rows2(self):
+        w = deepcopy(wrapper)
+        
+        filtered_rows = w.filter_rows('dc.source', should_be_empty=True)
+        assert len(filtered_rows) == 2
+        assert 2 in filtered_rows
+        assert 3 in filtered_rows
+        
+    def test_18_cell_contains(self):
         w = deepcopy(wrapper)
         
         assert w.cell_contains('dc.title', 1, 'title1')
@@ -223,7 +231,7 @@ class TestCsvWrapper(unittest.TestCase):
         assert w.cell_contains('dc.title', 4, 'title5')
         assert not w.cell_contains('dc.title', 4, 'copyme')
         
-    def test_18_find_by_value_function_map(self):
+    def test_19_find_by_value_function_map(self):
         w = deepcopy(wrapper)
         
         def vf(value):
@@ -241,7 +249,7 @@ class TestCsvWrapper(unittest.TestCase):
         assert matches2[4][0] == 'findme'
         assert matches3[1][0] == 'findme'
     
-    def test_19_c2c_apply_value_function(self):
+    def test_20_c2c_apply_value_function(self):
         w = deepcopy(wrapper)
         
         def vf(value):
@@ -255,3 +263,23 @@ class TestCsvWrapper(unittest.TestCase):
         # changed, corresponding to the last element of dc.source
         # containing the string "findme"
         assert w.csv_dict['dc.title'][1][-1] == 'THIS_IN_DESTINATION'
+        
+    def test_21_c2c_copy_cells(self):
+        w = deepcopy(wrapper)
+        
+        ids = [2,3]
+        
+        w.c2c_copy_cells('dc.identifier', 'dc.source', ids)
+        assert 'id2' in w.csv_dict['dc.source'][2]
+        assert "id3", "desc1" in w.csv_dict['dc.source'][3]
+        
+    def test_22_filter_columns(self):
+        w = deepcopy(wrapper)
+        
+        w.filter_columns('dc.description', 'dc.title')
+        
+        assert w.csv_dict.has_key('dc.description')
+        assert w.csv_dict.has_key('dc.title')
+        assert not w.csv_dict.has_key("dc.identifier")
+        assert not w.csv_dict.has_key("dc.source")
+        assert not w.csv_dict.has_key("dc.description[en]")

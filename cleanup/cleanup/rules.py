@@ -3,14 +3,62 @@ A set of rules implemented over the CSVWrapper which manage the
 metadata cleanup tasks
 """
 
+from csvwrapper import normalise_strings, denormalise_strings
+
 # Data shared between common functions and rules
-known_organisations = ['x4l healthier nation', 'leeds metropolitan university', 'cilip', 'the learning bank', 'university of york', 'institution of enterprise', 'open educational repository in support of computer science', 'uclan', 'uclanoer', 'phg', 'phgk', 'core-materials', 'dipex', 'learning and skills network ltd', 'saylor foundation']
+known_organisations = ["Aston Business School", "Aston University", "Bangor University", "Barrow in Furness 6th Form College", "Bede College", "Bexley College", "Bishop Auckland College", "Blackburn College", "Blackburn University Centre", "Boston College", "Bournemouth University", "Bournemouth and Poole College", "Bournville College", "Bradford College", "Bradford University", "Braintree College", "Bristol University", "Brockenhurst College", "Brunel University", "Burton College", "CILIP", "Calderdale College", "Camberwell college of the arts", "Canterbury Christ Church University", "Cardiff Metropolitan University", "Cardiff University", "Central Saint Martins College of Art And Design", "Coleg Llandrillo Cymru", "Colorado School of Mines", "Core-Materials", "Coventry University", "Craven College", "Croyden College", "De Montfort University", "Deeside College", "Dipex", "Division for Lifelong Learning - University of Bath", "Doncaster College", "Dunstable College", "EDINA", "East Durham and Houghall College", "Edge Hill University", "Edinburgh Napier University", "Fuseworks", "Gateshead College", "Gateway College", "Glasgow Caledonian University", "Grimsby College", "Harlow College", "Hartlepool College", "Hartpury College", "Harvard Law School", "Henley College", "Hibernia College", "Highbury College", "Huddersfield College", "Hull College", "Imperial College London", "Imperial College, London", "Institution of Enterprise", "JISC", "Keele University", "King's College London", "Lancaster University", "Learning And Skills Network Ltd", "Leeds College of Building", "Leeds General University", "Leeds Metropolitan University", "Leicester College", "Leicester University", "Liverpool John Moores University", "London College of Communication", "London College of Fashion", "London Metropolitan University", "Loughborough University", "MIMAS", "Manchester Metropolitan University", "Massey University", "Melbourne School of Population Health", "Middlesbrough College", "Morley College", "Nelson and Colne College", "Nescot College", "New College Nottingham", "New College Telford", "Newcastle College", "Newcastle Under Lyme College", "Newcastle University", "North Hertfordshire College", "North West London College", "Northampton College", "Northumbria University", "Nottingham University", "Oaklands College", "Open Educational Repository In Support of Computer Science", "Open University", "Oxford Brookes University", "Oxford University", "Penwith College", "Peterborough College", "Phg", "Phgk", "Plymouth University", "Priestley College", "Queen Mary University of London", "Queen's University Belfast", "Reading University", "Redcar & Cleveland College", "Regent College", "Regent's College", "Roehampton University", "Rolls-Royce University Technology Centre", "Rose Bruford College of Theatre and Performance", "Royal Holloway University", "Royal Society of Chemistry", "Royal Veterinary College", "Saylor Foundation", "Scotland's Colleges", "Sheffield Hallam University", "Somerset College of Arts & Technology", "South Devon College", "South East Essex VI Form College", "South Thames College", "Southampton Solent University", "Southport College", "St Brendan's 6th Form College", "St George's, University of London", "Staffordshire University", "Stamford College", "Stevenson College", "Stockton 6th Form College", "Stockton Riverside College", "Stoke on Trent 6th Form College", "Technical University of Denmark", "Teesside University", "Thames Valley University", "The Learning Bank", "The University of Liverpool", "Totton College", "Tyne Metropolitan College", "UCLAN", "University College Falmouth", "University College London", "University Federico II", "University Portsmouth", "University for the Creative Arts", "University of Aberdeen", "University of Ancona", "University of Bath", "University of Bedfordshire", "University of Birmingham", "University of Bolton", "University of Bradford", "University of Brighton", "University of Bristol", "University of British Columbia", "University of Cambridge", "University of Central Lancashire", "University of Cumbria", "University of Derby", "University of Dundee", "University of East London", "University of Edinburgh", "University of Exeter", "University of Ferrara", "University of Genoa", "University of Glamorgan", "University of Glasgow", "University of Gloucestershire", "University of Hertfordshire", "University of Hull", "University of Keele", "University of Leeds", "University of Leicester", "University of Leuven", "University of Lincoln", "University of Liverpool", "University of Manchester", "University of Minnesota", "University of New South Wales", "University of Northumbria", "University of Nottingham", "University of Oxford", "University of Padova", "University of Portsmouth", "University of Reading", "University of Sheffield", "University of Southampton", "University of Stockholm", "University of Strathclyde", "University of Surrey", "University of Ulster", "University of Wales, Newport", "University of Warwick", "University of Westminster", "University of Wolverhampton", "University of Worcester", "University of York", "University of the Arts London", "Varndean College", "Wakefield College", "West Hertforsdhire College", "West Kent College", "West Nottinghamshire College", "Weston College", "Winstanley College", "Worcester College of Technology", "Worcester University", "X4L Healthier Nation", "York St John University"]
+
+# add \' versions for all organisations which have an apostrophe in the name
+known_organisations_lookup = known_organisations[:]
+for o in known_organisations_lookup:
+    if "'" in o:
+        known_organisations.append(o.replace("'", "\\'"))
+        
+
+norm_known_organisations, map_known_organisations = normalise_strings(known_organisations)
+
+ignore_if_org_present = {
+    'university of wales': 'University of Wales, Newport',
+}
+
+canonical_org_forms = {
+    # non-canonical -> canonical mapping
+    'University of Wales - Newport': 'University of Wales, Newport',
+    'Stafforshire University': "Staffordshire University",
+    "Fuseworks": "Fusedworks",
+    'bradford managment school': "Bradford University",
+    "Bradford Management School": "Bradford University",
+    "Department of Criminology Leicester University": "Leicester University",
+    "Department of Materials Science and Metallurgy, University of Cambridge": "University of Cambridge",
+    "School of Geography, University of Leeds": "University of Leeds",
+    (u"King"+u'\u2019'+u"s College London").encode('utf-8'): "King's College London",
+    "Imperial College": "Imperial College London",
+    "Liverpool John Moroes University": "Liverpool John Moores University",
+    "coventy university": "Coventry University",
+    "Leeds Metropolitian University": "Leeds Metropolitan University"
+}
 
 org_keywords = ['university', 'institution', 'school', 'college']
 
+columns_added_by_cleanup = []
+
 # Functions shared between different rules
 ###########################################################
+def add_column_to_csv(csv_wrapper, column):
+    csv_wrapper.add_column(column)
+    if column not in columns_added_by_cleanup:
+        columns_added_by_cleanup.append(column)
 
+def strip_duplicates(values):
+    norm_values, map = normalise_strings(values)
+    
+    new_values = []
+    for value in norm_values:
+        if value not in new_values:
+            new_values.append(value)
+            
+    return denormalise_strings(new_values, map)
+    
 def split_by_semicolon(values):
         new_values = []
         for value in values:
@@ -32,20 +80,22 @@ def strip_email(values):
         if re.match(x, value) is None:
             new_values.append(value)
     return new_values
-
+    
 def may_be_org(data):
     """
-    True if the given string looks like an organisation name (certain keywords). 
+    Returns the given string if the given string looks like an organisation 
+    name (certain keywords). 
     False otherwise.
     """
     value = data.strip().lower()
     if not value:
     # it's definitely NOT an organisation if it's only whitespace
         return False
-        
+    
+    import re
     for word in org_keywords:
-        if word in value:
-            return True
+        if re.search('('+word+'\s|\s'+word+')', value):
+            return data
     
     return False
     
@@ -55,50 +105,68 @@ def is_known_org(data):
     # it's definitely NOT a known organisation if it's only whitespace
         return False
     
-    if value in known_organisations:
-        return True
-    else:
-        return False
-        
-def is_known_org_return_match(data):
-    value = data.strip().lower()
-    if not value:
-    # it's definitely NOT a known organisation if it's only whitespace
-        return False
-    
-    if value in known_organisations:
+    if value in norm_known_organisations:
         return data
     else:
         return False
         
 def may_be_nonorg(data):
-    could_be_org = may_be_org(data) or is_known_org(data)
-    return not could_be_org
-
-def may_be_org_return_match(data):
-    """
-    Return the given string if the given string looks like an organisation 
-    name (certain keywords). 
-    False otherwise.
-    """
-    value = data.strip().lower()
-    if not value:
-    # it's definitely NOT an organisation if it's only whitespace
-        return False
-        
-    for word in org_keywords:
-        if word in value:
-            return data
-    
-    return False
-    
-
-def may_be_nonorg_return_match(data):
     if may_be_org(data) or is_known_org(data):
         return False # not a non-org
         
     return data
+    
+def contains_known_org(data):
+    value = data.strip().lower()
+    if not value:
+    # it's definitely NOT a known organisation if it's only whitespace
+        return False
 
+    for o in norm_known_organisations:
+        if o in value:
+            return map_known_organisations[o]
+        
+    nonc = contains_non_canonical_org(data)
+    if nonc:
+        return nonc
+    
+    return False
+    
+def contained_within_known_org(data):
+    """
+    Check whether the given string is contained within a known organisation's name and return the known organisation which matches (first hit).
+    False otherwise.
+    """
+    value = data.strip().lower()
+    if not value:
+    # it's definitely NOT a known organisation if it's only whitespace
+        return False
+        
+    for o in norm_known_organisations:
+        if value in o:
+            return map_known_organisations[o]
+    
+    return False
+    
+def contains_non_canonical_org(data):
+    """
+    Return canonical form if so.
+    """
+    value = data.strip().lower()
+    if not value:
+    # it was only whitespace
+        return False
+
+    keys = canonical_org_forms.keys()
+    
+    norm_keys, map = normalise_strings(keys)
+    
+    for o in norm_keys:
+        if o in value:
+            return canonical_org_forms[map[value]]
+        
+    return False
+        
 def normalise_dates(value):
     from datetime import datetime
     # 2009-08-21T01:50:21+01:00
@@ -134,7 +202,7 @@ def normalise_dates(value):
         # successfully parsed the date
         return parses[0].strftime("%Y-%m-%dT%H:%M:%SZ")
     else:
-        # ambigouos date format, so remove it
+        # ambiguous date format, so remove it
         return None
     
 # 1. Advisor columns
@@ -234,13 +302,8 @@ def rule2h_author(csv_wrapper):
         
     csv_wrapper.apply_value_function('dc.contributor.author[en]', replace_vcard)
     
-# 2.i. Copy all organisation names to dc.publisher[en] where possible.
-# check for known, commonly appearing organisations
+# 2.i. if value == 'uclanoer' || value == 'uclan' -> delete value
 def rule2i_author(csv_wrapper):
-    csv_wrapper.c2c_apply_value_function('dc.contributor.author[en]', 'dc.publisher[en]', is_known_org_return_match)
-    
-# 2.j. if value == 'uclanoer' || value == 'uclan' -> delete value
-def rule2j_author(csv_wrapper):
     def delete_uclan_uclanoer_authors(data):
         if data == 'uclan' or data == 'uclanoer':
             return None
@@ -324,6 +387,7 @@ def rule5e_subject(csv_wrapper):
         # strip quotes
         stripchars = ['"']
         # "smart" quotes
+        stripchars.append(u'\u2019'.encode('utf-8')) 
         stripchars.append(u'\u201c'.encode('utf-8')) 
         stripchars.append(u'\u201d'.encode('utf-8'))
         
@@ -345,23 +409,20 @@ def rule5f_subject(csv_wrapper):
     
     def fix_multival(values):
         new_values = []
-        splitchars = [',', ';']
+        
         for value in values:
             results = []
-            tripped = False
-            for char in splitchars:
-                results = value.split(char)
-                if len(results) > 1:
-                    new_values += [x.strip() for x in results]
-                    tripped = True
-            if not tripped:
-                new_values.append(value)
+            results = value.split(',')
+            for result in results:
+                results2 = []
+                results2 = result.split(';')
+                if len(results2) > 1:
+                    new_values += clean_list(results2)
+                else:
+                    new_values.append(result.strip())
         return new_values
     
     csv_wrapper.apply_cell_function("dc.subject[en]", fix_multival)
-
-def rule5g_subject(csv_wrapper):
-    csv_wrapper.c2c_apply_value_function('dc.subject[en]', 'dc.publisher[en]', is_known_org_return_match)
 
 # 6. Coverage column group
 ###########################################################
@@ -509,9 +570,10 @@ def rule13a_publisher(csv_wrapper):
 
 # 13.b. auto-detect non-organisations names (e.g. "university", "school", etc) and flag for manual intervention
 def rule13b_publisher(csv_wrapper):
-    matches = csv_wrapper.find_by_value_function_map('dc.publisher[en]', may_be_nonorg_return_match)
+    matches = csv_wrapper.find_by_value_function_map('dc.publisher[en]', may_be_nonorg)
     
-    csv_wrapper.add_column("note.dc.publisher[en]")
+    add_column_to_csv(csv_wrapper,"note.dc.publisher[en]")
+    add_column_to_csv(csv_wrapper,"manual.dc.publisher[en].is_not_person_name")
     
     for id, values in matches.items():
         for value in values:
@@ -561,50 +623,102 @@ def rule14a_lom(csv_wrapper):
     csv_wrapper.merge_columns('lom.vcard', 'dc.publisher[en]')
     
 # 15. Merge results of manual work into main dataset
-# TODO pending some results from said manual work!
+###########################################################
+
+# 15.a. Rule 13.b. detects potential person names in dc.publisher[en]
+# helpman.py is then used to produce a slice of the dataset for human review.
+# If a certain dc.publisher[en] suspicious value should NOT be copied over to 
+# dc.contributor.author[en], this is noted by populating the item's
+# manual.dc.publisher[en].is_not_person_name field (value is "y" by convention
+# but any value in this field will do).
+def rule15a_mergemanual(csv_wrapper):
+    if csv_wrapper.csv_dict.has_key('manual.dc.publisher[en].is_not_person_name'):
+        merge_ids = csv_wrapper.filter_rows('manual.dc.publisher[en].is_not_person_name', should_be_empty=True)
+        csv_wrapper.c2c_copy_cells('note.dc.publisher[en]', 'dc.contributor.author[en]', merge_ids)
     
+# 15.b. Rule 16.e. detects potential organisation names in 
+# dc.contributor.author[en] and dc.subject[en] . helpman.py is then used to 
+# produce a slice for human review. When the main cleanup.py module is run 
+# again, all values in manual.organisations.add_to_publisher will be added to 
+# the corresponding dc.publisher[en].
+def rule15b_mergemanual(csv_wrapper):
+    if csv_wrapper.csv_dict.has_key('manual.organisations.add_to_publisher'):
+        merge_ids = csv_wrapper.filter_rows('manual.organisations.add_to_publisher', should_be_empty=False)
+        csv_wrapper.c2c_copy_cells('manual.organisations.add_to_publisher', 'dc.publisher[en]', merge_ids)
+            
 # 16. General tidying
 ###########################################################
 
-# 16.a. delete the contents of all fields where the only value in the field is 
-# "||", the multiple value separator
-# 16.b. for all fields with multiple values, de-duplicate repeated values
-# this rule should cover both of these ...
+# 16.a. detect and delete all e-mail addresses
 def rule16a_general(csv_wrapper):
-    from csvwrapper import normalise_strings, denormalise_strings
-    def strip_duplicates(values):
-        norm_values, map = normalise_strings(values)
-        
-        new_values = []
-        for value in norm_values:
-            if value not in new_values:
-                new_values.append(value)
-                
-        return denormalise_strings(new_values, map)
+    csv_wrapper.apply_global_cell_function(strip_email)
+
+# 16.b. delete the contents of all fields where the only value in the field is 
+# "||", the multiple value separator
+# 16.c. for all fields with multiple values, de-duplicate repeated values
+# this rule should cover both of these ...
+def rule16c_general(csv_wrapper):
     csv_wrapper.apply_global_cell_function(strip_duplicates)
 
-# 16.c. auto-detect and flag instances of "university", "institution", 
+# 16.d. Copy all organisation names from dc.contributor.author[en] and dc.subject[en] to dc.publisher[en] where possible.
+def rule16d_general(csv_wrapper):
+    csv_wrapper.c2c_apply_value_function('dc.contributor.author[en]', 'dc.publisher[en]', contains_known_org)
+    csv_wrapper.c2c_apply_value_function('dc.subject[en]', 'dc.publisher[en]', contains_known_org)
+    
+# 16.e. auto-detect and flag instances of "university", "institution", 
 # "school", "college" etc, and report on the rows where these occur, for possible 
 # manual intervention
-def rule16c_general(csv_wrapper):
+def rule16e_general(csv_wrapper):
     # dc.contributor.author[en]
     # dc.subject[en]
     
     def review_if_not_already_in_target(target, matches):
+        # for all items where the source fields tripped the org. name detection
         for id, values in matches.items():
+        
+            # for each value which might be an org. name
+            # e.g. "Emanuil Tolev (University of Manchester)"
             for value in values:
+                norm_val = value.strip().lower()
+                
+                # check whether the target field doesn't already have this suspicious string
                 if not csv_wrapper.cell_contains(target, id, value):
-                    if not csv_wrapper.cell_contains("note.organisations", id, value):
-                        csv_wrapper.add_value("note.organisations", id, value)
+                    # no, the target field doesn't have this exact string as a stand-alone value
+                    
+                    # e.g.: rules 2.i. and 5.g. would have detected and placed "University of Manchester" in the target field, but not "Emanuil Tolev (University of Manchester)"
+                
+                    # check if this value (which tripped the org. name detection)
+                    # contains a known organisation
+                    known_org = contains_known_org(value)
+                    # e.g. "University of Manchester"
+                    if known_org:
+                        # it does - so check whether the target field contains this known organisation
+                        # it did not have the exact value we're looking for, but rules 2.i. and 5.g. might have copied *just* the organisation name
+                        if not csv_wrapper.cell_contains(target, id, known_org):
+                            # finally, if it's completely unknown, add it to the notes
+                            csv_wrapper.add_value("note.organisations", id, value)
+                    else:
+                        # no known organisation present in suspicious value
+                        
+                        # there are certain values we ignore if the target field contains a certain organisation name
+                        # e.g. we ignore "university of wales" if the target field already has "University of Wales, Newport"
+                        if ignore_if_org_present.has_key(norm_val):
+                            if not csv_wrapper.cell_contains(target, id, ignore_if_org_present[norm_val]):
+                                csv_wrapper.add_value("note.organisations", id, value)
+                        
+                        else:
+                            csv_wrapper.add_value("note.organisations", id, value)
 
-    csv_wrapper.add_column("note.organisations")
+    add_column_to_csv(csv_wrapper,"note.organisations")
+    add_column_to_csv(csv_wrapper,'manual.organisations.add_to_publisher')
     
-    matches1 = csv_wrapper.find_by_value_function_map("dc.contributor.author[en]", may_be_org_return_match)
-    matches2 = csv_wrapper.find_by_value_function_map("dc.subject[en]", may_be_org_return_match)
+    matches1 = csv_wrapper.find_by_value_function_map("dc.contributor.author[en]", may_be_org)
+    matches2 = csv_wrapper.find_by_value_function_map("dc.subject[en]", may_be_org)
     
     review_if_not_already_in_target('dc.publisher[en]', matches1)
     review_if_not_already_in_target('dc.publisher[en]', matches2)
 
-# 16.d. detect and delete all e-mail addresses
-def rule16d_general(csv_wrapper):
-    csv_wrapper.apply_global_cell_function(strip_email)
+# 16.f. delete intermediary columns which were used for metadata enhancement
+def rule16f_general(csv_wrapper):
+    for col in columns_added_by_cleanup:
+        csv_wrapper.delete_column(col)
