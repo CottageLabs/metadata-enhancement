@@ -5,7 +5,7 @@ cleaned_file = sys.argv[2]
 outdir = sys.argv[3]
 
 ROW_COUNT = 500
-CMD = "$DSPACE_BIN/dspace metadata-import -f "
+CMD = "$DSPACE_BIN/dspace metadata-import -s -f "
 
 print "CONFIG: original DSpace export file: " + original_file
 print "CONFIG: cleaned metadata file (to be imported): " + cleaned_file
