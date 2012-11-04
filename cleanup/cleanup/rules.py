@@ -40,14 +40,14 @@ canonical_org_forms = {
 
 org_keywords = ['university', 'institution', 'school', 'college']
 
-columns_added_by_cleanup = []
+columns_added_by_cleanup = ['manual.dc.publisher[en].is_not_person_name', 'manual.organisations.add_to_publisher', 'note.dc.publisher[en]', 'note.organisations']
 
 # Functions shared between different rules
 ###########################################################
 def add_column_to_csv(csv_wrapper, column):
     csv_wrapper.add_column(column)
-    if column not in columns_added_by_cleanup:
-        columns_added_by_cleanup.append(column)
+    # if column not in columns_added_by_cleanup:
+        # columns_added_by_cleanup.append(column)
 
 def strip_duplicates(values):
     norm_values, map = normalise_strings(values)
