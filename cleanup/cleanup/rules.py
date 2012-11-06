@@ -451,6 +451,8 @@ def rule7b_date(csv_wrapper):
 
 # 7.c. merge dc.date.accessioned[*] into dc.date.accessioned
 # FIXME: this data does not seem to be present in the latest metadata export
+# ET 2012-11-06 data still not present although we're almost ready to hand 
+# the code and data over. Assuming not needed to be processed any more.
 def rule7c_date(csv_wrapper):
     pass
 
