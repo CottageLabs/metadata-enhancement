@@ -44,7 +44,12 @@ class CSVWrapper(object):
                         header_index_map[i] = row[i]
                     else:
                         key = header_index_map[i]
-                        self.csv_dict[key][int(row[0])] = self._tokenise(row[i])
+                        try:
+                            self.csv_dict[key][int(row[0])] = self._tokenise(row[i])
+                        except ValueError as ve:
+                            print 'One of the id-s doesn\'t seem to be an integer:', row[0]
+                            print
+                            raise
                 if first: 
                     first = False
         
