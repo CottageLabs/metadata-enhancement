@@ -589,6 +589,7 @@ def rule13c_publisher(csv_wrapper):
     def normalise_mimas(data):
         if data == 'MIMAS':
             return 'Mimas'
+        return data
             
     csv_wrapper.apply_value_function('dc.publisher[en]', normalise_mimas)
 

@@ -82,7 +82,7 @@ else: # run all of the rules
         # identifier
         rules.rule12a_identifier,
         # publisher
-        rules.rule13a_publisher, rules.rule13b_publisher,
+        rules.rule13a_publisher, rules.rule13b_publisher, rules.rule13c_publisher,
         # LOM
         rules.rule14a_lom,
         # Merge results from manual processing
@@ -93,7 +93,7 @@ else: # run all of the rules
     ]
 
 draft_only_rules = []
-release_only_rules = [rules.rule15a_mergemanual, rules.rule15b_mergemanual, rules.rule16c_general, rules.rule16f_general]
+release_only_rules = [rules.rule13c_publisher, rules.rule15a_mergemanual, rules.rule15b_mergemanual, rules.rule16c_general, rules.rule16f_general]
 
 # load the csv
 print "Loading csv from " + CSV + " ..."
