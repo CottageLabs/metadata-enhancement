@@ -583,6 +583,15 @@ def rule13b_publisher(csv_wrapper):
                 if not csv_wrapper.cell_contains("note.dc.publisher[en]", id, value):
                     csv_wrapper.add_value("note.dc.publisher[en]", id, value)
 
+
+# 13.c. correct 'MIMAS' to 'Mimas' everywhere in publisher
+def rule13c_publisher(csv_wrapper):
+    def normalise_mimas(data):
+        if data == 'MIMAS':
+            return 'Mimas'
+            
+    csv_wrapper.apply_value_function('dc.publisher[en]', normalise_mimas)
+
 # 14. LOM columns:
 ##############################################################
 

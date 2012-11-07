@@ -14,7 +14,7 @@ data = {
     'dc.contributor.author[English]' : {1 : [""], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.contributor.author[en-gb]' : {1 : ["publisher1"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     
-    'dc.publisher[en]' : {1 : [""], 2: [""], 3: ['University of Glamorgan'], 4: ['Diamond Dragon School'], 5: ['Bond, James Bond', 'Agent Smith'], 6: ['Archmage College'], 7: ['']},
+    'dc.publisher[en]' : {1 : [""], 2: [""], 3: ['University of Glamorgan'], 4: ['Diamond Dragon School'], 5: ['Bond, James Bond', 'Agent Smith'], 6: ['Archmage College'], 7: ['MIMAS']},
     'dc.publisher' : {1 : ["test"], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['']},
     'dc.publisher[en-gb]' : {1 : ["test", 'test2'], 2: [""], 3: [''], 4: [''], 5: [''], 6: [''], 7: ['test.email@example.com']},
     
@@ -572,6 +572,13 @@ class TestRules(unittest.TestCase):
         assert 'Agent Smith' not in w.csv_dict['note.dc.publisher[en]'][5]
         assert 'Bond, James Bond' in w.csv_dict['note.dc.publisher[en]'][5]
         assert w.csv_dict['note.dc.publisher[en]'][6][0] == ''
+    
+    def test_13c_publisher(self):
+        w = deepcopy(wrapper)
+        
+        rules.rule13c_publisher(w)
+        
+        assert w.csv_dict['dc.publisher[en]'][7][0] == 'Mimas'
         
     def test_14a_lom(self):
         w = deepcopy(wrapper)
